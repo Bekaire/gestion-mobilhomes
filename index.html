@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16a34a">
+    <meta name="description" content="Application de gestion de mobil-homes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Gestion Mobil-Homes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f0fdf4 !important;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        html {
+            background-color: #f0fdf4 !important;
+        }
+        h1 { text-align: center; font-size: 28px; margin-bottom: 20px; color: #166534; }
+        
+        .filters {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #16a34a;
+            border-radius: 8px;
+            background: white;
+            color: #16a34a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .filter-btn:hover {
+            background: #dcfce7;
+        }
+        .filter-btn.active {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .grid { 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+        .mh-card {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            overflow: visible;
+            transition: transform 0.2s;
+        }
+        .mh-card:hover { transform: scale(1.05); }
+        .mh-card.libre { background: #3b82f6; }
+        .mh-card.occupe { background: #ef4444; }
+        .mh-card.electric { box-shadow: 0 0 0 4px #facc15; }
+        .mh-card.hidden { display: none; }
+        
+        .indicator { 
+            position: absolute;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .gaz-mh { 
+            top: 8px;
+            left: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .gaz-plancha {
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 16px;
+            border-radius: 3px;
+        }
+        .plein { background: #22c55e; }
+        .vide { background: #f97316; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #f0fdf4;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            background: #16a34a;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modal-header h2 { font-size: 22px; }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+        .modal-body { padding: 20px; }
+        .field {
+            margin-bottom: 20px;
+        }
+        .field label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #166534;
+        }
+        .field input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .field textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-blue { background: #3b82f6; }
+        .btn-red { background: #ef4444; }
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-small:hover { opacity: 0.8; }
+        .btn-orange { background: #f97316; color: white; }
+        .btn-yellow { background: #facc15; color: #000; }
+        .btn-green { background: #22c55e; color: white; }
+        .btn-gray { background: #e5e7eb; color: #374151; }
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .checkbox-field input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏕️ Gestion Mobil-Homes</h1>
+    
+    <div class="filters" id="filters">
+        <button class="filter-btn active" onclick="filterByType('Tous')">Tous</button>
+    </div>
+    
+    <div class="grid" id="grid"></div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">MH #</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let data = {};
+        let selected = null;
+        let currentFilter = 'Tous';
+
+        function init() {
+            const saved = localStorage.getItem('camping-mh');
+            if (saved) {
+                data = JSON.parse(saved);
+            } else {
+                for (let i = 1; i <= 39; i++) {
+                    if (i === 13) continue;
+                    data[i] = {
+                        numero: i,
+                        type: 'Mn Grand Confort',
+                        occupe: false,
+                        alimentation: 'Gaz',
+                        gazMH: 'Plein',
+                        plancha: false,
+                        gazPlancha: 'Plein',
+                        notes: ''
+                    };
+                }
+                save();
+            }
+            updateFilters();
+            render();
+        }
+
+        function save() {
+            localStorage.setItem('camping-mh', JSON.stringify(data));
+        }
+
+        function updateFilters() {
+            const types = new Set();
+            Object.values(data).forEach(mh => {
+                if (mh.type && mh.type.trim()) {
+                    types.add(mh.type);
+                }
+            });
+            
+            const filtersDiv = document.getElementById('filters');
+            filtersDiv.innerHTML = '<button class="filter-btn active" onclick="filterByType(\'Tous\')">Tous</button>';
+            
+            Array.from(types).sort().forEach(type => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = type;
+                btn.onclick = () => filterByType(type);
+                filtersDiv.appendChild(btn);
+            });
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            
+            // Mise à jour visuelle des boutons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === type) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            render();
+        }
+
+        function render() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            Object.keys(data).forEach(num => {
+                const mh = data[num];
+                const card = document.createElement('div');
+                
+                // Appliquer le filtre
+                const shouldShow = currentFilter === 'Tous' || mh.type === currentFilter;
+                
+                card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${mh.alimentation === 'Électrique' ? 'electric' : ''} ${!shouldShow ? 'hidden' : ''}`;
+                card.onclick = () => openModal(num);
+                
+                card.innerHTML = `<span>${num}</span>`;
+                
+                if (mh.alimentation === 'Gaz') {
+                    const gazIndicator = document.createElement('div');
+                    gazIndicator.className = `indicator gaz-mh ${mh.gazMH === 'Plein' ? 'plein' : 'vide'}`;
+                    card.appendChild(gazIndicator);
+                }
+                
+                if (mh.plancha) {
+                    const planchaIndicator = document.createElement('div');
+                    planchaIndicator.className = `indicator gaz-plancha ${mh.gazPlancha === 'Plein' ? 'plein' : 'vide'}`;
+                    card.appendChild(planchaIndicator);
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(num) {
+            selected = num;
+            const mh = data[num];
+            document.getElementById('modal-title').textContent = `MH #${num}`;
+            
+            let html = `
+                <div class="field">
+                    <label>Type de mobil-home</label>
+                    <input type="text" id="type" value="${mh.type}">
+                </div>
+                
+                <div class="field">
+                    <label>Statut</label>
+                    <button class="btn ${mh.occupe ? 'btn-red' : 'btn-blue'}" onclick="toggleOccupe()">
+                        ${mh.occupe ? '🔴 Occupé - Cliquez pour libérer' : '🔵 Libre - Cliquez pour occuper'}
+                    </button>
+                </div>
+                
+                <div class="field">
+                    <label>Alimentation</label>
+                    <div class="btn-grid">
+                        <button class="btn-small ${mh.alimentation === 'Gaz' ? 'btn-orange' : 'btn-gray'}" onclick="setAlimentation('Gaz')">
+                            🔥 Gaz
+                        </button>
+                        <button class="btn-small ${mh.alimentation === 'Électrique' ? 'btn-yellow' : 'btn-gray'}" onclick="setAlimentation('Électrique')">
+                            ⚡ Électrique
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            if (mh.alimentation === 'Gaz') {
+                html += `
+                    <div class="field">
+                        <label>Niveau gaz mobil-home</label>
+                        <div class="btn-grid">
+                            <button class="btn-small ${mh.gazMH === 'Plein' ? 'btn-green' : 'btn-gray'}" onclick="setGazMH('Plein')">
+                                🟢 Plein
+                            </button>
+                            <button class="btn-small ${mh.gazMH === 'Bientôt vide' ? 'btn-orange' : 'btn-gray'}" onclick="setGazMH('Bientôt vide')">
+                                🟠 Bientôt vide
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="field">
+                    <div class="checkbox-field">
+                        <input type="checkbox" id="plancha" ${mh.plancha ? 'checked' : ''} onchange="togglePlancha()">
+                        <label for="plancha" style="margin: 0;">A une plancha 🍖</label>
+                    </div>
+                </div>
+            `;
+            
+            if (mh.plancha) {
+                html += `
+                    <div class="field">
+                        <label>Niveau gaz plancha</label>
+                        <div class="btn-grid">
+                            <button class="btn-small ${mh.gazPlancha === 'Plein' ? 'btn-green' : 'btn-gray'}" onclick="setGazPlancha('Plein')">
+                                🟢 Plein
+                            </button>
+                            <button class="btn-small ${mh.gazPlancha === 'Bientôt vide' ? 'btn-orange' : 'btn-gray'}" onclick="setGazPlancha('Bientôt vide')">
+                                🟠 Bientôt vide
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="field">
+                    <label>📝 Notes / Interventions à prévoir</label>
+                    <textarea id="notes" placeholder="Ex: Réparer volet chambre, Vérifier chauffe-eau, Particularités...">${mh.notes || ''}</textarea>
+                </div>
+            `;
+            
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            if (selected) {
+                const newType = document.getElementById('type').value;
+                const oldType = data[selected].type;
+                data[selected].type = newType;
+                data[selected].notes = document.getElementById('notes').value;
+                save();
+                
+                // Si le type a changé, mettre à jour les filtres
+                if (newType !== oldType) {
+                    updateFilters();
+                }
+            }
+            document.getElementById('modal').classList.remove('show');
+            render();
+        }
+
+        function toggleOccupe() {
+            data[selected].occupe = !data[selected].occupe;
+            save();
+            openModal(selected);
+        }
+
+        function setAlimentation(type) {
+            data[selected].alimentation = type;
+            save();
+            openModal(selected);
+        }
+
+        function setGazMH(niveau) {
+            data[selected].gazMH = niveau;
+            save();
+            openModal(selected);
+        }
+
+        function togglePlancha() {
+            data[selected].plancha = !data[selected].plancha;
+            save();
+            openModal(selected);
+        }
+
+        function setGazPlancha(niveau) {
+            data[selected].gazPlancha = niveau;
+            save();
+            openModal(selected);
+        }
+
+        document.getElementById('modal').onclick = function(e) {
+            if (e.target === this) closeModal();
+        };
+
+        init();
+
+        // Enregistrement du Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker enregistré'))
+                    .catch(err => console.log('Erreur Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
