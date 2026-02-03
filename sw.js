@@ -1,10 +1,10 @@
-const CACHE_NAME = 'mh-gestion-v2';
+const CACHE_NAME = 'mh-gestion-v3';
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  '/gestion-mobilhomes/',
+  '/gestion-mobilhomes/index.html',
+  '/gestion-mobilhomes/manifest.json',
+  '/gestion-mobilhomes/icon-192.png',
+  '/gestion-mobilhomes/icon-512.png'
 ];
 
 // Installation du service worker
