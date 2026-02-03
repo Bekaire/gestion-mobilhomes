@@ -216,6 +216,99 @@
             height: 20px;
             cursor: pointer;
         }
+        .photo-upload {
+            margin-top: 10px;
+        }
+        .photo-upload input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #16a34a;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: opacity 0.2s;
+        }
+        .upload-btn:hover {
+            opacity: 0.9;
+        }
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .photo-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .photo-delete:hover {
+            background: #dc2626;
+        }
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .photo-modal.show {
+            display: flex;
+        }
+        .photo-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+        .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -235,6 +328,11 @@
             </div>
             <div class="modal-body" id="modal-body"></div>
         </div>
+    </div>
+
+    <div class="photo-modal" id="photoModal">
+        <button class="photo-modal-close" onclick="closePhotoModal()">&times;</button>
+        <img id="photoModalImg" src="" alt="Photo">
     </div>
 
     <script>
@@ -257,7 +355,8 @@
                         gazMH: 'Plein',
                         plancha: false,
                         gazPlancha: 'Plein',
-                        notes: ''
+                        notes: '',
+                        photos: []
                     };
                 }
                 save();
@@ -413,6 +512,32 @@
                     <label>📝 Notes / Interventions à prévoir</label>
                     <textarea id="notes" placeholder="Ex: Réparer volet chambre, Vérifier chauffe-eau, Particularités...">${mh.notes || ''}</textarea>
                 </div>
+                
+                <div class="field">
+                    <label>📸 Photos</label>
+                    <div class="photo-upload">
+                        <label for="photo-input-${num}" class="upload-btn">
+                            📷 Ajouter une photo
+                        </label>
+                        <input type="file" id="photo-input-${num}" accept="image/*" onchange="addPhoto(event)" multiple>
+                    </div>
+                    <div class="photo-gallery" id="photo-gallery">
+            `;
+            
+            if (mh.photos && mh.photos.length > 0) {
+                mh.photos.forEach((photo, index) => {
+                    html += `
+                        <div class="photo-item">
+                            <img src="${photo}" alt="Photo ${index + 1}" onclick="viewPhoto('${photo}')">
+                            <button class="photo-delete" onclick="deletePhoto(${index})">&times;</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                </div>
             `;
             
             document.getElementById('modal-body').innerHTML = html;
@@ -466,8 +591,47 @@
             openModal(selected);
         }
 
+        function addPhoto(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (!data[selected].photos) {
+                        data[selected].photos = [];
+                    }
+                    data[selected].photos.push(e.target.result);
+                    save();
+                    openModal(selected);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function deletePhoto(index) {
+            if (confirm('Supprimer cette photo ?')) {
+                data[selected].photos.splice(index, 1);
+                save();
+                openModal(selected);
+            }
+        }
+
+        function viewPhoto(photoSrc) {
+            document.getElementById('photoModalImg').src = photoSrc;
+            document.getElementById('photoModal').classList.add('show');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.remove('show');
+        }
+
         document.getElementById('modal').onclick = function(e) {
             if (e.target === this) closeModal();
+        };
+
+        document.getElementById('photoModal').onclick = function(e) {
+            if (e.target === this) closePhotoModal();
         };
 
         init();
