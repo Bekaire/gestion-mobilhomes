@@ -3,647 +3,601 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#16a34a">
-    <meta name="description" content="Application de gestion de mobil-homes">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <title>Gestion Mobil-Homes</title>
+    <link rel="manifest" href="/gestion-mobilhomes/manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <link rel="apple-touch-icon" href="/gestion-mobilhomes/icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: #f0fdf4 !important;
-            min-height: 100vh;
-            padding: 20px;
+        .section-header {
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
         }
-        html {
-            background-color: #f0fdf4 !important;
-        }
-        h1 { text-align: center; font-size: 28px; margin-bottom: 20px; color: #166534; }
-        
-        .filters {
-            max-width: 1200px;
-            margin: 0 auto 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid #16a34a;
-            border-radius: 8px;
-            background: white;
-            color: #16a34a;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-        .filter-btn:hover {
-            background: #dcfce7;
-        }
-        .filter-btn.active {
-            background: #16a34a;
-            color: white;
-        }
-        
-        .grid { 
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto 30px;
-        }
-        .mh-card {
-            aspect-ratio: 1;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            position: relative;
-            overflow: visible;
+        .stat-card {
             transition: transform 0.2s;
         }
-        .mh-card:hover { transform: scale(1.05); }
-        .mh-card.libre { background: #3b82f6; }
-        .mh-card.occupe { background: #ef4444; }
-        .mh-card.electric { box-shadow: 0 0 0 4px #facc15; }
-        .mh-card.hidden { display: none; }
-        
-        .indicator { 
-            position: absolute;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .stat-card:hover {
+            transform: translateY(-2px);
         }
-        .gaz-mh { 
-            top: 8px;
-            left: 8px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-        }
-        .gaz-plancha {
-            top: 8px;
-            right: 8px;
-            width: 20px;
-            height: 16px;
-            border-radius: 3px;
-        }
-        .plein { background: #22c55e; }
-        .vide { background: #f97316; }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 1000;
-        }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: #f0fdf4;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .modal-header {
-            background: #16a34a;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 15px 15px 0 0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .modal-header h2 { font-size: 22px; }
-        .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            line-height: 1;
-        }
-        .modal-body { padding: 20px; }
-        .field {
-            margin-bottom: 20px;
-        }
-        .field label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #166534;
-        }
-        .field input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        .field textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            resize: vertical;
-            min-height: 100px;
-        }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-            transition: opacity 0.2s;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn-blue { background: #3b82f6; }
-        .btn-red { background: #ef4444; }
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .btn-small {
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn-small:hover { opacity: 0.8; }
-        .btn-orange { background: #f97316; color: white; }
-        .btn-yellow { background: #facc15; color: #000; }
-        .btn-green { background: #22c55e; color: white; }
-        .btn-gray { background: #e5e7eb; color: #374151; }
-        .checkbox-field {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .checkbox-field input {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        .photo-upload {
-            margin-top: 10px;
-        }
-        .photo-upload input[type="file"] {
-            display: none;
-        }
-        .upload-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #16a34a;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            text-align: center;
-            transition: opacity 0.2s;
-        }
-        .upload-btn:hover {
-            opacity: 0.9;
-        }
-        .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .photo-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            cursor: pointer;
-        }
-        .photo-delete {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .photo-delete:hover {
-            background: #dc2626;
-        }
-        .photo-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .photo-modal.show {
-            display: flex;
-        }
-        .photo-modal img {
-            max-width: 100%;
-            max-height: 90vh;
-            border-radius: 10px;
-        }
-        .photo-modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        @media print {
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body>
-    <h1>🏕️ Gestion Mobil-Homes</h1>
-    
-    <div class="filters" id="filters">
-        <button class="filter-btn active" onclick="filterByType('Tous')">Tous</button>
-    </div>
-    
-    <div class="grid" id="grid"></div>
-
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-title">MH #</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen pb-20">
+        <!-- Header -->
+        <header class="section-header text-white p-6 shadow-lg no-print">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-3xl font-bold mb-2">🏕️ Gestion Mobil-Homes</h1>
+                <p class="text-green-100">Suivi et gestion de vos emplacements</p>
             </div>
-            <div class="modal-body" id="modal-body"></div>
-        </div>
-    </div>
+        </header>
 
-    <div class="photo-modal" id="photoModal">
-        <button class="photo-modal-close" onclick="closePhotoModal()">&times;</button>
-        <img id="photoModalImg" src="" alt="Photo">
+        <!-- Navigation Tabs -->
+        <nav class="bg-white shadow-md sticky top-0 z-10 no-print">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex space-x-1 overflow-x-auto">
+                    <button onclick="showTab('dashboard')" 
+                            class="tab-btn px-6 py-4 font-medium transition-colors whitespace-nowrap"
+                            data-tab="dashboard">
+                        📊 Tableau de bord
+                    </button>
+                    <button onclick="showTab('mobilhomes')" 
+                            class="tab-btn px-6 py-4 font-medium transition-colors whitespace-nowrap"
+                            data-tab="mobilhomes">
+                        🏠 Mobil-Homes
+                    </button>
+                    <button onclick="showTab('occupants')" 
+                            class="tab-btn px-6 py-4 font-medium transition-colors whitespace-nowrap"
+                            data-tab="occupants">
+                        👥 Occupants
+                    </button>
+                    <button onclick="showTab('settings')" 
+                            class="tab-btn px-6 py-4 font-medium transition-colors whitespace-nowrap"
+                            data-tab="settings">
+                        ⚙️ Paramètres
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto p-4 mt-6">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Stats Cards -->
+                    <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Mobil-Homes</p>
+                                <p id="total-mh" class="text-3xl font-bold text-green-600">0</p>
+                            </div>
+                            <div class="text-4xl">🏠</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Occupés</p>
+                                <p id="occupied-mh" class="text-3xl font-bold text-blue-600">0</p>
+                            </div>
+                            <div class="text-4xl">✅</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Disponibles</p>
+                                <p id="available-mh" class="text-3xl font-bold text-orange-600">0</p>
+                            </div>
+                            <div class="text-4xl">🔓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des Mobil-Homes -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold mb-4">État des emplacements</h2>
+                    <div id="dashboard-list" class="space-y-3">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobil-Homes Tab -->
+            <div id="mobilhomes-tab" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Gestion des Mobil-Homes</h2>
+                        <button onclick="showAddMHForm()" 
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            ➕ Ajouter
+                        </button>
+                    </div>
+                    
+                    <!-- Add MH Form -->
+                    <div id="add-mh-form" class="hidden mb-6 p-4 bg-green-50 rounded-lg">
+                        <h3 class="font-bold mb-3">Nouveau Mobil-Home</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="mh-numero" placeholder="Numéro" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="text" id="mh-emplacement" placeholder="Emplacement" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="text" id="mh-modele" placeholder="Modèle" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="number" id="mh-annee" placeholder="Année" 
+                                   class="border rounded-lg px-4 py-2">
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="saveMH()" 
+                                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+                                Enregistrer
+                            </button>
+                            <button onclick="hideAddMHForm()" 
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="mh-list" class="space-y-3">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Occupants Tab -->
+            <div id="occupants-tab" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Gestion des Occupants</h2>
+                        <button onclick="showAddOccupantForm()" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            ➕ Ajouter
+                        </button>
+                    </div>
+                    
+                    <!-- Add Occupant Form -->
+                    <div id="add-occupant-form" class="hidden mb-6 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="font-bold mb-3">Nouvel Occupant</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="occ-nom" placeholder="Nom" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="text" id="occ-prenom" placeholder="Prénom" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="tel" id="occ-telephone" placeholder="Téléphone" 
+                                   class="border rounded-lg px-4 py-2">
+                            <input type="email" id="occ-email" placeholder="Email" 
+                                   class="border rounded-lg px-4 py-2">
+                            <select id="occ-mh" class="border rounded-lg px-4 py-2">
+                                <option value="">Sélectionner un Mobil-Home</option>
+                            </select>
+                            <input type="date" id="occ-date-entree" 
+                                   class="border rounded-lg px-4 py-2">
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="saveOccupant()" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                                Enregistrer
+                            </button>
+                            <button onclick="hideAddOccupantForm()" 
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="occupant-list" class="space-y-3">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold mb-4">Paramètres et Données</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-yellow-50 rounded-lg">
+                            <h3 class="font-bold mb-2">⚠️ Zone de danger</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Cette action supprimera toutes les données de l'application.
+                            </p>
+                            <button onclick="clearAllData()" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg">
+                                Effacer toutes les données
+                            </button>
+                        </div>
+                        
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <h3 class="font-bold mb-2">💾 Export des données</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Téléchargez vos données au format JSON.
+                            </p>
+                            <button onclick="exportData()" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                                Exporter les données
+                            </button>
+                        </div>
+                        
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <h3 class="font-bold mb-2">📥 Import des données</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Importez des données depuis un fichier JSON.
+                            </p>
+                            <input type="file" id="import-file" accept=".json" class="mb-2">
+                            <button onclick="importData()" 
+                                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+                                Importer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        let data = {};
-        let selected = null;
-        let currentFilter = 'Tous';
+        // Data Storage
+        let mobilhomes = JSON.parse(localStorage.getItem('mobilhomes')) || [];
+        let occupants = JSON.parse(localStorage.getItem('occupants')) || [];
 
+        // Initialize App
         function init() {
-            const saved = localStorage.getItem('camping-mh');
-            if (saved) {
-                data = JSON.parse(saved);
-            } else {
-                for (let i = 1; i <= 39; i++) {
-                    if (i === 13) continue;
-                    data[i] = {
-                        numero: i,
-                        type: 'Mn Grand Confort',
-                        occupe: false,
-                        alimentation: 'Gaz',
-                        gazMH: 'Plein',
-                        plancha: false,
-                        gazPlancha: 'Plein',
-                        notes: '',
-                        photos: []
-                    };
+            showTab('dashboard');
+            updateDashboard();
+            renderMHList();
+            renderOccupantList();
+            updateMHSelect();
+        }
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('border-b-4', 'border-green-600', 'text-green-600');
+                } else {
+                    btn.classList.remove('border-b-4', 'border-green-600', 'text-green-600');
+                    btn.classList.add('text-gray-600');
                 }
-                save();
+            });
+        }
+
+        // Dashboard Functions
+        function updateDashboard() {
+            const total = mobilhomes.length;
+            const occupied = mobilhomes.filter(mh => 
+                occupants.some(occ => occ.mobilhomeId === mh.id)
+            ).length;
+            const available = total - occupied;
+
+            document.getElementById('total-mh').textContent = total;
+            document.getElementById('occupied-mh').textContent = occupied;
+            document.getElementById('available-mh').textContent = available;
+
+            renderDashboardList();
+        }
+
+        function renderDashboardList() {
+            const container = document.getElementById('dashboard-list');
+            
+            if (mobilhomes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun mobil-home enregistré</p>';
+                return;
             }
-            updateFilters();
-            render();
+
+            container.innerHTML = mobilhomes.map(mh => {
+                const occupant = occupants.find(occ => occ.mobilhomeId === mh.id);
+                const isOccupied = !!occupant;
+                
+                return `
+                    <div class="flex items-center justify-between p-4 border rounded-lg ${isOccupied ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'}">
+                        <div>
+                            <div class="font-bold">${mh.numero} - ${mh.emplacement}</div>
+                            ${isOccupied ? `<div class="text-sm text-gray-600">👤 ${occupant.nom} ${occupant.prenom}</div>` : ''}
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm ${isOccupied ? 'bg-blue-200 text-blue-800' : 'bg-orange-200 text-orange-800'}">
+                            ${isOccupied ? '✅ Occupé' : '🔓 Disponible'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function save() {
-            localStorage.setItem('camping-mh', JSON.stringify(data));
+        // Mobil-Home Functions
+        function showAddMHForm() {
+            document.getElementById('add-mh-form').classList.remove('hidden');
         }
 
-        function updateFilters() {
-            const types = new Set();
-            Object.values(data).forEach(mh => {
-                if (mh.type && mh.type.trim()) {
-                    types.add(mh.type);
-                }
-            });
-            
-            const filtersDiv = document.getElementById('filters');
-            filtersDiv.innerHTML = '<button class="filter-btn active" onclick="filterByType(\'Tous\')">Tous</button>';
-            
-            Array.from(types).sort().forEach(type => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn';
-                btn.textContent = type;
-                btn.onclick = () => filterByType(type);
-                filtersDiv.appendChild(btn);
-            });
+        function hideAddMHForm() {
+            document.getElementById('add-mh-form').classList.add('hidden');
+            clearMHForm();
         }
 
-        function filterByType(type) {
-            currentFilter = type;
-            
-            // Mise à jour visuelle des boutons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent === type) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            render();
+        function clearMHForm() {
+            document.getElementById('mh-numero').value = '';
+            document.getElementById('mh-emplacement').value = '';
+            document.getElementById('mh-modele').value = '';
+            document.getElementById('mh-annee').value = '';
         }
 
-        function render() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
+        function saveMH() {
+            const numero = document.getElementById('mh-numero').value.trim();
+            const emplacement = document.getElementById('mh-emplacement').value.trim();
+            const modele = document.getElementById('mh-modele').value.trim();
+            const annee = document.getElementById('mh-annee').value.trim();
+
+            if (!numero || !emplacement) {
+                alert('Le numéro et l\'emplacement sont obligatoires');
+                return;
+            }
+
+            const newMH = {
+                id: Date.now().toString(),
+                numero,
+                emplacement,
+                modele,
+                annee
+            };
+
+            mobilhomes.push(newMH);
+            localStorage.setItem('mobilhomes', JSON.stringify(mobilhomes));
             
-            Object.keys(data).forEach(num => {
-                const mh = data[num];
-                const card = document.createElement('div');
-                
-                // Appliquer le filtre
-                const shouldShow = currentFilter === 'Tous' || mh.type === currentFilter;
-                
-                card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${mh.alimentation === 'Électrique' ? 'electric' : ''} ${!shouldShow ? 'hidden' : ''}`;
-                card.onclick = () => openModal(num);
-                
-                card.innerHTML = `<span>${num}</span>`;
-                
-                if (mh.alimentation === 'Gaz') {
-                    const gazIndicator = document.createElement('div');
-                    gazIndicator.className = `indicator gaz-mh ${mh.gazMH === 'Plein' ? 'plein' : 'vide'}`;
-                    card.appendChild(gazIndicator);
-                }
-                
-                if (mh.plancha) {
-                    const planchaIndicator = document.createElement('div');
-                    planchaIndicator.className = `indicator gaz-plancha ${mh.gazPlancha === 'Plein' ? 'plein' : 'vide'}`;
-                    card.appendChild(planchaIndicator);
-                }
-                
-                grid.appendChild(card);
-            });
+            hideAddMHForm();
+            renderMHList();
+            updateDashboard();
+            updateMHSelect();
         }
 
-        function openModal(num) {
-            selected = num;
-            const mh = data[num];
-            document.getElementById('modal-title').textContent = `MH #${num}`;
+        function renderMHList() {
+            const container = document.getElementById('mh-list');
             
-            let html = `
-                <div class="field">
-                    <label>Type de mobil-home</label>
-                    <input type="text" id="type" value="${mh.type}">
-                </div>
-                
-                <div class="field">
-                    <label>Statut</label>
-                    <button class="btn ${mh.occupe ? 'btn-red' : 'btn-blue'}" onclick="toggleOccupe()">
-                        ${mh.occupe ? '🔴 Occupé - Cliquez pour libérer' : '🔵 Libre - Cliquez pour occuper'}
+            if (mobilhomes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun mobil-home enregistré</p>';
+                return;
+            }
+
+            container.innerHTML = mobilhomes.map(mh => `
+                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div>
+                        <div class="font-bold">${mh.numero} - ${mh.emplacement}</div>
+                        <div class="text-sm text-gray-600">${mh.modele || 'N/A'} ${mh.annee ? `(${mh.annee})` : ''}</div>
+                    </div>
+                    <button onclick="deleteMH('${mh.id}')" 
+                            class="text-red-600 hover:text-red-800 px-3 py-1">
+                        🗑️
                     </button>
                 </div>
-                
-                <div class="field">
-                    <label>Alimentation</label>
-                    <div class="btn-grid">
-                        <button class="btn-small ${mh.alimentation === 'Gaz' ? 'btn-orange' : 'btn-gray'}" onclick="setAlimentation('Gaz')">
-                            🔥 Gaz
-                        </button>
-                        <button class="btn-small ${mh.alimentation === 'Électrique' ? 'btn-yellow' : 'btn-gray'}" onclick="setAlimentation('Électrique')">
-                            ⚡ Électrique
-                        </button>
-                    </div>
-                </div>
-            `;
+            `).join('');
+        }
+
+        function deleteMH(id) {
+            if (!confirm('Supprimer ce mobil-home ?')) return;
             
-            if (mh.alimentation === 'Gaz') {
-                html += `
-                    <div class="field">
-                        <label>Niveau gaz mobil-home</label>
-                        <div class="btn-grid">
-                            <button class="btn-small ${mh.gazMH === 'Plein' ? 'btn-green' : 'btn-gray'}" onclick="setGazMH('Plein')">
-                                🟢 Plein
-                            </button>
-                            <button class="btn-small ${mh.gazMH === 'Bientôt vide' ? 'btn-orange' : 'btn-gray'}" onclick="setGazMH('Bientôt vide')">
-                                🟠 Bientôt vide
-                            </button>
+            mobilhomes = mobilhomes.filter(mh => mh.id !== id);
+            localStorage.setItem('mobilhomes', JSON.stringify(mobilhomes));
+            
+            renderMHList();
+            updateDashboard();
+            updateMHSelect();
+        }
+
+        // Occupant Functions
+        function showAddOccupantForm() {
+            document.getElementById('add-occupant-form').classList.remove('hidden');
+        }
+
+        function hideAddOccupantForm() {
+            document.getElementById('add-occupant-form').classList.add('hidden');
+            clearOccupantForm();
+        }
+
+        function clearOccupantForm() {
+            document.getElementById('occ-nom').value = '';
+            document.getElementById('occ-prenom').value = '';
+            document.getElementById('occ-telephone').value = '';
+            document.getElementById('occ-email').value = '';
+            document.getElementById('occ-mh').value = '';
+            document.getElementById('occ-date-entree').value = '';
+        }
+
+        function saveOccupant() {
+            const nom = document.getElementById('occ-nom').value.trim();
+            const prenom = document.getElementById('occ-prenom').value.trim();
+            const telephone = document.getElementById('occ-telephone').value.trim();
+            const email = document.getElementById('occ-email').value.trim();
+            const mobilhomeId = document.getElementById('occ-mh').value;
+            const dateEntree = document.getElementById('occ-date-entree').value;
+
+            if (!nom || !prenom || !mobilhomeId) {
+                alert('Le nom, prénom et mobil-home sont obligatoires');
+                return;
+            }
+
+            // Check if MH is already occupied
+            const existingOccupant = occupants.find(occ => occ.mobilhomeId === mobilhomeId);
+            if (existingOccupant) {
+                alert('Ce mobil-home est déjà occupé');
+                return;
+            }
+
+            const newOccupant = {
+                id: Date.now().toString(),
+                nom,
+                prenom,
+                telephone,
+                email,
+                mobilhomeId,
+                dateEntree
+            };
+
+            occupants.push(newOccupant);
+            localStorage.setItem('occupants', JSON.stringify(occupants));
+            
+            hideAddOccupantForm();
+            renderOccupantList();
+            updateDashboard();
+        }
+
+        function renderOccupantList() {
+            const container = document.getElementById('occupant-list');
+            
+            if (occupants.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun occupant enregistré</p>';
+                return;
+            }
+
+            container.innerHTML = occupants.map(occ => {
+                const mh = mobilhomes.find(m => m.id === occ.mobilhomeId);
+                return `
+                    <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                        <div>
+                            <div class="font-bold">${occ.nom} ${occ.prenom}</div>
+                            <div class="text-sm text-gray-600">
+                                🏠 ${mh ? `${mh.numero} - ${mh.emplacement}` : 'N/A'}
+                            </div>
+                            ${occ.telephone ? `<div class="text-sm text-gray-600">📞 ${occ.telephone}</div>` : ''}
+                            ${occ.email ? `<div class="text-sm text-gray-600">📧 ${occ.email}</div>` : ''}
                         </div>
+                        <button onclick="deleteOccupant('${occ.id}')" 
+                                class="text-red-600 hover:text-red-800 px-3 py-1">
+                            🗑️
+                        </button>
                     </div>
                 `;
+            }).join('');
+        }
+
+        function deleteOccupant(id) {
+            if (!confirm('Supprimer cet occupant ?')) return;
+            
+            occupants = occupants.filter(occ => occ.id !== id);
+            localStorage.setItem('occupants', JSON.stringify(occupants));
+            
+            renderOccupantList();
+            updateDashboard();
+        }
+
+        function updateMHSelect() {
+            const select = document.getElementById('occ-mh');
+            const availableMH = mobilhomes.filter(mh => 
+                !occupants.some(occ => occ.mobilhomeId === mh.id)
+            );
+
+            select.innerHTML = '<option value="">Sélectionner un Mobil-Home</option>' +
+                availableMH.map(mh => 
+                    `<option value="${mh.id}">${mh.numero} - ${mh.emplacement}</option>`
+                ).join('');
+        }
+
+        // Settings Functions
+        function clearAllData() {
+            if (!confirm('⚠️ ATTENTION : Toutes les données seront supprimées définitivement. Continuer ?')) {
+                return;
             }
             
-            html += `
-                <div class="field">
-                    <div class="checkbox-field">
-                        <input type="checkbox" id="plancha" ${mh.plancha ? 'checked' : ''} onchange="togglePlancha()">
-                        <label for="plancha" style="margin: 0;">A une plancha 🍖</label>
-                    </div>
-                </div>
-            `;
+            localStorage.clear();
+            mobilhomes = [];
+            occupants = [];
             
-            if (mh.plancha) {
-                html += `
-                    <div class="field">
-                        <label>Niveau gaz plancha</label>
-                        <div class="btn-grid">
-                            <button class="btn-small ${mh.gazPlancha === 'Plein' ? 'btn-green' : 'btn-gray'}" onclick="setGazPlancha('Plein')">
-                                🟢 Plein
-                            </button>
-                            <button class="btn-small ${mh.gazPlancha === 'Bientôt vide' ? 'btn-orange' : 'btn-gray'}" onclick="setGazPlancha('Bientôt vide')">
-                                🟠 Bientôt vide
-                            </button>
-                        </div>
-                    </div>
-                `;
+            init();
+            alert('✅ Toutes les données ont été effacées');
+        }
+
+        function exportData() {
+            const data = {
+                mobilhomes,
+                occupants,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mobilhomes-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Données exportées avec succès');
+        }
+
+        function importData() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Veuillez sélectionner un fichier');
+                return;
             }
             
-            html += `
-                <div class="field">
-                    <label>📝 Notes / Interventions à prévoir</label>
-                    <textarea id="notes" placeholder="Ex: Réparer volet chambre, Vérifier chauffe-eau, Particularités...">${mh.notes || ''}</textarea>
-                </div>
-                
-                <div class="field">
-                    <label>📸 Photos</label>
-                    <div class="photo-upload">
-                        <label for="photo-input-${num}" class="upload-btn">
-                            📷 Ajouter une photo
-                        </label>
-                        <input type="file" id="photo-input-${num}" accept="image/*" onchange="addPhoto(event)" multiple>
-                    </div>
-                    <div class="photo-gallery" id="photo-gallery">
-            `;
-            
-            if (mh.photos && mh.photos.length > 0) {
-                mh.photos.forEach((photo, index) => {
-                    html += `
-                        <div class="photo-item">
-                            <img src="${photo}" alt="Photo ${index + 1}" onclick="viewPhoto('${photo}')">
-                            <button class="photo-delete" onclick="deletePhoto(${index})">&times;</button>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += `
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('modal-body').innerHTML = html;
-            document.getElementById('modal').classList.add('show');
-        }
-
-        function closeModal() {
-            if (selected) {
-                const newType = document.getElementById('type').value;
-                const oldType = data[selected].type;
-                data[selected].type = newType;
-                data[selected].notes = document.getElementById('notes').value;
-                save();
-                
-                // Si le type a changé, mettre à jour les filtres
-                if (newType !== oldType) {
-                    updateFilters();
-                }
-            }
-            document.getElementById('modal').classList.remove('show');
-            render();
-        }
-
-        function toggleOccupe() {
-            data[selected].occupe = !data[selected].occupe;
-            save();
-            openModal(selected);
-        }
-
-        function setAlimentation(type) {
-            data[selected].alimentation = type;
-            save();
-            openModal(selected);
-        }
-
-        function setGazMH(niveau) {
-            data[selected].gazMH = niveau;
-            save();
-            openModal(selected);
-        }
-
-        function togglePlancha() {
-            data[selected].plancha = !data[selected].plancha;
-            save();
-            openModal(selected);
-        }
-
-        function setGazPlancha(niveau) {
-            data[selected].gazPlancha = niveau;
-            save();
-            openModal(selected);
-        }
-
-        function addPhoto(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-            
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (!data[selected].photos) {
-                        data[selected].photos = [];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.mobilhomes || !data.occupants) {
+                        throw new Error('Format de fichier invalide');
                     }
-                    data[selected].photos.push(e.target.result);
-                    save();
-                    openModal(selected);
-                };
-                reader.readAsDataURL(file);
-            });
+                    
+                    if (confirm('⚠️ L\'import remplacera toutes les données actuelles. Continuer ?')) {
+                        mobilhomes = data.mobilhomes;
+                        occupants = data.occupants;
+                        
+                        localStorage.setItem('mobilhomes', JSON.stringify(mobilhomes));
+                        localStorage.setItem('occupants', JSON.stringify(occupants));
+                        
+                        init();
+                        alert('✅ Données importées avec succès');
+                        fileInput.value = '';
+                    }
+                } catch (error) {
+                    alert('❌ Erreur lors de l\'import : ' + error.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
-        function deletePhoto(index) {
-            if (confirm('Supprimer cette photo ?')) {
-                data[selected].photos.splice(index, 1);
-                save();
-                openModal(selected);
-            }
-        }
-
-        function viewPhoto(photoSrc) {
-            document.getElementById('photoModalImg').src = photoSrc;
-            document.getElementById('photoModal').classList.add('show');
-        }
-
-        function closePhotoModal() {
-            document.getElementById('photoModal').classList.remove('show');
-        }
-
-        document.getElementById('modal').onclick = function(e) {
-            if (e.target === this) closeModal();
-        };
-
-        document.getElementById('photoModal').onclick = function(e) {
-            if (e.target === this) closePhotoModal();
-        };
-
+        // Initialize on page load
         init();
+    </script>
 
-        // Enregistrement du Service Worker pour PWA
+    <!-- Service Worker Registration -->
+    <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker enregistré'))
-                    .catch(err => console.log('Erreur Service Worker:', err));
+                navigator.serviceWorker.register('/gestion-mobilhomes/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ Erreur d\'enregistrement du Service Worker:', error);
+                    });
             });
         }
+
+        // Install prompt handling
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('✅ Prompt d\'installation disponible');
+        });
     </script>
 </body>
 </html>
