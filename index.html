@@ -349,22 +349,59 @@
                     if (!data[key].marque) data[key].marque = '';
                     if (!data[key].annee) data[key].annee = '';
                     if (!data[key].nom) data[key].nom = '';
-                    if (!data[key].nb_chambres) data[key].nb_chambres = '';
-                    if (!data[key].nb_lits) data[key].nb_lits = '';
-                    if (!data[key].taille_lits) data[key].taille_lits = '';
                 });
             } else {
+                // Données pré-remplies
+                const mhData = {
+                    1: { nom: 'SILÈNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    2: { nom: 'AZUR', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    3: { nom: 'SABLE', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    4: { nom: 'SALSOLA', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    5: { nom: 'LAGUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    6: { nom: 'DUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    7: { nom: 'MER', type: 'Cottage Cosy 3Ch 6Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    8: { nom: 'OYAT', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    9: { nom: 'GALETS', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    10: { nom: 'OEILLET', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    11: { nom: 'HORIZON', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    12: { nom: 'CIEL ET MER', type: 'Villa Ciel et Mer - 8Pers', marque: 'CISTEBOIS', annee: '2021' },
+                    14: { nom: 'BUTOR', type: 'MH grand confort 2Ch 4Pers', marque: 'RIDEAU', annee: '2015' },
+                    15: { nom: 'TEISSIA', type: 'Chalet grand confort 3Ch 6Pers', marque: 'SAMIBOIS', annee: '' },
+                    16: { nom: 'NEPTUNE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
+                    17: { nom: 'MEREE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
+                    19: { nom: 'CHARDON', type: 'MH Confort 2Ch 4Pers', marque: 'IRM', annee: '2009' },
+                    20: { nom: 'ROSEAU', type: 'MH Confort 2Ch 4Pers', marque: 'RAPID HOME', annee: '2005' },
+                    21: { nom: 'TAMARIS', type: 'MH Confort 2Ch 4Pers', marque: 'SUN ROLLER', annee: '2007' },
+                    23: { nom: 'DIANTHUS', type: 'MH grand confort 2Ch 2sdb 4P', marque: 'RAPID HOME', annee: '2019' },
+                    24: { nom: 'VOLPIE', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                    25: { nom: 'CAREX', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                    26: { nom: 'MAIA', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                    27: { nom: 'JONC', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                    28: { nom: 'ALIZÉE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    29: { nom: 'RIVAGE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    30: { nom: 'FLOT', type: 'MH Confort + 2Ch 4Pers', marque: 'RIDEAU', annee: '2013' },
+                    31: { nom: 'PIPIT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
+                    32: { nom: 'BARGE', type: 'MH grand confort 2Ch 4Pers', marque: 'IRM', annee: '2018' },
+                    33: { nom: 'GRAVELOT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
+                    34: { nom: 'MARELIE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    35: { nom: 'OCEAN', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    36: { nom: 'VAGUES', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    37: { nom: 'GORGE BLEUE', type: 'Loggia 3 Ch 5 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    38: { nom: 'PANURE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                    39: { nom: 'REMIZ', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' }
+                };
+                
                 for (let i = 1; i <= 39; i++) {
-                    if (i === 13) continue;
+                    if (i === 13 || i === 18 || i === 22) continue; // Résidents et hébergement saisonnier
+                    
+                    const info = mhData[i] || { nom: '', type: '', marque: '', annee: '' };
+                    
                     data[i] = {
                         numero: i,
-                        type: 'Mn Grand Confort',
-                        marque: '',
-                        annee: '',
-                        nom: '',
-                        nb_chambres: '',
-                        nb_lits: '',
-                        taille_lits: '',
+                        type: info.type,
+                        marque: info.marque,
+                        annee: info.annee,
+                        nom: info.nom,
                         occupe: false,
                         alimentation: 'Gaz',
                         gazMH: 'Plein',
@@ -472,31 +509,6 @@
                 </div>
                 
                 <div class="field">
-                    <label>Marque</label>
-                    <input type="text" id="marque" value="${mh.marque || ''}" placeholder="Ex: IRM, Rideau, O'Hara...">
-                </div>
-                
-                <div class="field">
-                    <label>Année</label>
-                    <input type="text" id="annee" value="${mh.annee || ''}" placeholder="Ex: 2018">
-                </div>
-                
-                <div class="field">
-                    <label>Nombre de chambres</label>
-                    <input type="text" id="nb_chambres" value="${mh.nb_chambres || ''}" placeholder="Ex: 2, 3...">
-                </div>
-                
-                <div class="field">
-                    <label>Nombre de lits</label>
-                    <input type="text" id="nb_lits" value="${mh.nb_lits || ''}" placeholder="Ex: 4, 5...">
-                </div>
-                
-                <div class="field">
-                    <label>Taille des lits</label>
-                    <input type="text" id="taille_lits" value="${mh.taille_lits || ''}" placeholder="Ex: 2x140, 2x90 ou 140x190, 90x190...">
-                </div>
-                
-                <div class="field">
                     <label>Statut</label>
                     <button class="btn ${mh.occupe ? 'btn-red' : 'btn-blue'}" onclick="toggleOccupe()">
                         ${mh.occupe ? '🔴 Occupé - Cliquez pour libérer' : '🔵 Libre - Cliquez pour occuper'}
@@ -588,6 +600,16 @@
             html += `
                     </div>
                 </div>
+                
+                <div class="field">
+                    <label>Marque</label>
+                    <input type="text" id="marque" value="${mh.marque || ''}" placeholder="Ex: IRM, Rideau, O'Hara...">
+                </div>
+                
+                <div class="field">
+                    <label>Année</label>
+                    <input type="text" id="annee" value="${mh.annee || ''}" placeholder="Ex: 2018">
+                </div>
             `;
             
             document.getElementById('modal-body').innerHTML = html;
@@ -602,9 +624,6 @@
                 data[selected].nom = document.getElementById('nom').value;
                 data[selected].marque = document.getElementById('marque').value;
                 data[selected].annee = document.getElementById('annee').value;
-                data[selected].nb_chambres = document.getElementById('nb_chambres').value;
-                data[selected].nb_lits = document.getElementById('nb_lits').value;
-                data[selected].taille_lits = document.getElementById('taille_lits').value;
                 data[selected].notes = document.getElementById('notes').value;
                 save();
                 
