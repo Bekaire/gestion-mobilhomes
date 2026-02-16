@@ -344,12 +344,27 @@
             const saved = localStorage.getItem('camping-mh');
             if (saved) {
                 data = JSON.parse(saved);
+                // Ajouter les nouvelles propriétés aux données existantes si elles n'existent pas
+                Object.keys(data).forEach(key => {
+                    if (!data[key].marque) data[key].marque = '';
+                    if (!data[key].annee) data[key].annee = '';
+                    if (!data[key].nom) data[key].nom = '';
+                    if (!data[key].nb_chambres) data[key].nb_chambres = '';
+                    if (!data[key].nb_lits) data[key].nb_lits = '';
+                    if (!data[key].taille_lits) data[key].taille_lits = '';
+                });
             } else {
                 for (let i = 1; i <= 39; i++) {
                     if (i === 13) continue;
                     data[i] = {
                         numero: i,
                         type: 'Mn Grand Confort',
+                        marque: '',
+                        annee: '',
+                        nom: '',
+                        nb_chambres: '',
+                        nb_lits: '',
+                        taille_lits: '',
                         occupe: false,
                         alimentation: 'Gaz',
                         gazMH: 'Plein',
@@ -417,7 +432,12 @@
                 card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${mh.alimentation === 'Électrique' ? 'electric' : ''} ${!shouldShow ? 'hidden' : ''}`;
                 card.onclick = () => openModal(num);
                 
-                card.innerHTML = `<span>${num}</span>`;
+                card.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="font-size: 28px;">${num}</span>
+                        ${mh.nom ? `<span style="font-size: 12px; font-weight: 500; opacity: 0.9;">${mh.nom}</span>` : ''}
+                    </div>
+                `;
                 
                 if (mh.alimentation === 'Gaz') {
                     const gazIndicator = document.createElement('div');
@@ -442,8 +462,38 @@
             
             let html = `
                 <div class="field">
+                    <label>Nom du mobil-home</label>
+                    <input type="text" id="nom" value="${mh.nom || ''}" placeholder="Ex: Les Mimosas, Le Palmier...">
+                </div>
+                
+                <div class="field">
                     <label>Type de mobil-home</label>
                     <input type="text" id="type" value="${mh.type}">
+                </div>
+                
+                <div class="field">
+                    <label>Marque</label>
+                    <input type="text" id="marque" value="${mh.marque || ''}" placeholder="Ex: IRM, Rideau, O'Hara...">
+                </div>
+                
+                <div class="field">
+                    <label>Année</label>
+                    <input type="text" id="annee" value="${mh.annee || ''}" placeholder="Ex: 2018">
+                </div>
+                
+                <div class="field">
+                    <label>Nombre de chambres</label>
+                    <input type="text" id="nb_chambres" value="${mh.nb_chambres || ''}" placeholder="Ex: 2, 3...">
+                </div>
+                
+                <div class="field">
+                    <label>Nombre de lits</label>
+                    <input type="text" id="nb_lits" value="${mh.nb_lits || ''}" placeholder="Ex: 4, 5...">
+                </div>
+                
+                <div class="field">
+                    <label>Taille des lits</label>
+                    <input type="text" id="taille_lits" value="${mh.taille_lits || ''}" placeholder="Ex: 2x140, 2x90 ou 140x190, 90x190...">
                 </div>
                 
                 <div class="field">
@@ -549,6 +599,12 @@
                 const newType = document.getElementById('type').value;
                 const oldType = data[selected].type;
                 data[selected].type = newType;
+                data[selected].nom = document.getElementById('nom').value;
+                data[selected].marque = document.getElementById('marque').value;
+                data[selected].annee = document.getElementById('annee').value;
+                data[selected].nb_chambres = document.getElementById('nb_chambres').value;
+                data[selected].nb_lits = document.getElementById('nb_lits').value;
+                data[selected].taille_lits = document.getElementById('taille_lits').value;
                 data[selected].notes = document.getElementById('notes').value;
                 save();
                 
