@@ -797,7 +797,7 @@
             openModal(selected);
         }
 
-        async function addPhoto(event) {
+        async function _addPhoto(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
             
@@ -837,7 +837,7 @@
             openModal(selected);
         }
 
-        async function deletePhoto(index) {
+        async function _deletePhoto(index) {
             if (confirm('Supprimer cette photo ?')) {
                 const photoURL = data[selected].photos[index];
                 
@@ -876,6 +876,15 @@
         };
 
         init();
+
+        // Wrappers pour les fonctions async
+        function addPhoto(event) {
+            _addPhoto(event).catch(e => console.error('Erreur addPhoto:', e));
+        }
+        
+        function deletePhoto(index) {
+            _deletePhoto(index).catch(e => console.error('Erreur deletePhoto:', e));
+        }
 
         // Exposer les fonctions globalement (nécessaire avec type="module")
         window.openModal = openModal;
