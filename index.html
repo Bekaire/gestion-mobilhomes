@@ -348,6 +348,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCjHrx4W-udQdIfwIerBD-JoUNHz3-M-Vc",
@@ -361,6 +362,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const storage = firebase.storage();
 
         let data = {};
         let selected = null;
@@ -791,26 +793,61 @@
             openModal(selected);
         }
 
-        function addPhoto(event) {
+        async function addPhoto(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
             
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
+            // Afficher un indicateur de chargement
+            const gallery = document.getElementById('photo-gallery');
+            const loader = document.createElement('div');
+            loader.style.cssText = 'grid-column:1/-1; text-align:center; padding:20px; color:#166534;';
+            loader.innerHTML = '⏳ Upload en cours...';
+            gallery.appendChild(loader);
+            
+            for (const file of Array.from(files)) {
+                try {
+                    // Créer un nom unique pour la photo
+                    const timestamp = Date.now();
+                    const filename = `mh${selected}/${timestamp}_${file.name}`;
+                    const storageRef = storage.ref(filename);
+                    
+                    // Upload vers Firebase Storage
+                    await storageRef.put(file);
+                    
+                    // Récupérer l'URL de téléchargement
+                    const photoURL = await storageRef.getDownloadURL();
+                    
+                    // Sauvegarder juste l'URL dans la base de données
                     if (!data[selected].photos) {
                         data[selected].photos = [];
                     }
-                    data[selected].photos.push(e.target.result);
-                    save();
-                    openModal(selected);
-                };
-                reader.readAsDataURL(file);
-            });
+                    data[selected].photos.push(photoURL);
+                    
+                } catch(error) {
+                    console.error('Erreur upload photo:', error);
+                    alert('Erreur lors de l'upload de la photo');
+                }
+            }
+            
+            save();
+            openModal(selected);
         }
 
-        function deletePhoto(index) {
+        async function deletePhoto(index) {
             if (confirm('Supprimer cette photo ?')) {
+                const photoURL = data[selected].photos[index];
+                
+                // Supprimer de Storage si c'est une URL Firebase
+                if (photoURL && photoURL.includes('firebasestorage')) {
+                    try {
+                        const photoRef = storage.refFromURL(photoURL);
+                        await photoRef.delete();
+                    } catch(error) {
+                        console.warn('Erreur suppression Storage:', error);
+                    }
+                }
+                
+                // Supprimer de la base de données
                 data[selected].photos.splice(index, 1);
                 save();
                 openModal(selected);
