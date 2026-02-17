@@ -777,6 +777,21 @@
 
         init();
 
+        // Exposer les fonctions globalement (nécessaire avec type="module")
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.toggleOccupe = toggleOccupe;
+        window.setChauffageEau = setChauffageEau;
+        window.setCuisson = setCuisson;
+        window.setGazMH = setGazMH;
+        window.togglePlancha = togglePlancha;
+        window.setGazPlancha = setGazPlancha;
+        window.addPhoto = addPhoto;
+        window.deletePhoto = deletePhoto;
+        window.viewPhoto = viewPhoto;
+        window.closePhotoModal = closePhotoModal;
+        window.filterByType = filterByType;
+
     </script>
 </body>
 </html>
