@@ -585,11 +585,11 @@
                         </button>
                     </div>
                 </div>
-            \`;
+            `;
             
             const hasGaz = mh.chauffageEau === 'Gaz' || mh.cuisson === 'Gaz' || (!mh.chauffageEau && mh.alimentation === 'Gaz');
             if (hasGaz) {
-                html += \`
+                html += `
                     <div class="field">
                         <label>🔥 Niveau gaz</label>
                         <div class="btn-grid">
@@ -601,7 +601,7 @@
                             </button>
                         </div>
                     </div>
-                \`;
+                `;
             }
             
             html += `
