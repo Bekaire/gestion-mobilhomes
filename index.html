@@ -427,10 +427,30 @@
             return defaultData;
         }
 
+        function parseFirebaseData(savedData) {
+            // Firebase convertit les objets à clés numériques en tableaux
+            // On doit gérer les deux cas
+            if (Array.isArray(savedData)) {
+                // Ancien format : tableau avec null aux positions vides
+                const result = {};
+                savedData.forEach((mh, i) => {
+                    if (mh !== null && mh !== undefined) result[i] = mh;
+                });
+                return result;
+            } else {
+                // Nouveau format : objet avec clés préfixées "mh1", "mh2"...
+                const result = {};
+                Object.keys(savedData).forEach(k => {
+                    const num = k.startsWith('mh') ? k.replace('mh', '') : k;
+                    result[num] = savedData[k];
+                });
+                return result;
+            }
+        }
+
         function init() {
             document.getElementById('grid').innerHTML = '<p style="text-align:center; color:#166534; grid-column:1/-1; padding:40px;">⏳ Connexion en cours...</p>';
             
-            // Timeout : si Firebase ne répond pas en 5s, on bascule sur localStorage
             const fallbackTimer = setTimeout(() => {
                 console.warn('Firebase timeout, utilisation du localStorage');
                 loadFromLocalStorage();
@@ -442,11 +462,15 @@
                     clearTimeout(fallbackTimer);
                     const savedData = snapshot.val();
                     if (savedData) {
-                        data = savedData;
+                        data = parseFirebaseData(savedData);
                         localStorage.setItem('camping-mh-backup', JSON.stringify(data));
+                        // Réécrire proprement si c'était un tableau
+                        if (Array.isArray(savedData)) {
+                            saveToFirebase();
+                        }
                     } else {
                         data = getDefaultData();
-                        db.ref('mobilhomes').set(data);
+                        saveToFirebase();
                     }
                     updateFilters();
                     render();
@@ -476,15 +500,20 @@
             render();
         }
 
-        function save() {
-            // Sauvegarde locale immédiate
-            localStorage.setItem('camping-mh-backup', JSON.stringify(data));
-            // Sauvegarde Firebase en parallèle
+        function saveToFirebase() {
+            // Préfixer les clés avec "mh" pour éviter la conversion en tableau
+            const dataToSave = {};
+            Object.keys(data).forEach(k => { dataToSave['mh' + k] = data[k]; });
             try {
-                db.ref('mobilhomes').update(data);
+                db.ref('mobilhomes').set(dataToSave);
             } catch(e) {
-                console.warn('Sauvegarde Firebase échouée, données sauvées localement');
+                console.warn('Sauvegarde Firebase échouée');
             }
+        }
+
+        function save() {
+            localStorage.setItem('camping-mh-backup', JSON.stringify(data));
+            saveToFirebase();
         }
 
         function updateFilters() {
