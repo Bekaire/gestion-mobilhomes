@@ -428,33 +428,63 @@
         }
 
         function init() {
-            // Indicateur de chargement
             document.getElementById('grid').innerHTML = '<p style="text-align:center; color:#166534; grid-column:1/-1; padding:40px;">⏳ Connexion en cours...</p>';
             
-            const dbRef = db.ref('mobilhomes');
-            
-            // Écoute en temps réel : se déclenche à chaque changement
-            dbRef.on('value', (snapshot) => {
-                const savedData = snapshot.val();
-                if (savedData) {
-                    data = savedData;
-                } else {
-                    // Première utilisation : on initialise avec les données par défaut
-                    data = getDefaultData();
-                    db.ref('mobilhomes').set(data);
-                }
-                updateFilters();
-                render();
-                // Si un modal est ouvert, le rafraîchir
-                if (selected && document.getElementById('modal').classList.contains('show')) {
-                    openModal(selected);
-                }
-            });
+            // Timeout : si Firebase ne répond pas en 5s, on bascule sur localStorage
+            const fallbackTimer = setTimeout(() => {
+                console.warn('Firebase timeout, utilisation du localStorage');
+                loadFromLocalStorage();
+            }, 5000);
+
+            try {
+                const dbRef = db.ref('mobilhomes');
+                dbRef.on('value', (snapshot) => {
+                    clearTimeout(fallbackTimer);
+                    const savedData = snapshot.val();
+                    if (savedData) {
+                        data = savedData;
+                        localStorage.setItem('camping-mh-backup', JSON.stringify(data));
+                    } else {
+                        data = getDefaultData();
+                        db.ref('mobilhomes').set(data);
+                    }
+                    updateFilters();
+                    render();
+                    if (selected && document.getElementById('modal').classList.contains('show')) {
+                        openModal(selected);
+                    }
+                }, (error) => {
+                    clearTimeout(fallbackTimer);
+                    console.warn('Erreur Firebase:', error);
+                    loadFromLocalStorage();
+                });
+            } catch(e) {
+                clearTimeout(fallbackTimer);
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('camping-mh-backup');
+            if (saved) {
+                data = JSON.parse(saved);
+            } else {
+                data = getDefaultData();
+                localStorage.setItem('camping-mh-backup', JSON.stringify(data));
+            }
+            updateFilters();
+            render();
         }
 
         function save() {
-            // Sauvegarde en temps réel sur Firebase
-            db.ref('mobilhomes').update(data);
+            // Sauvegarde locale immédiate
+            localStorage.setItem('camping-mh-backup', JSON.stringify(data));
+            // Sauvegarde Firebase en parallèle
+            try {
+                db.ref('mobilhomes').update(data);
+            } catch(e) {
+                console.warn('Sauvegarde Firebase échouée, données sauvées localement');
+            }
         }
 
         function updateFilters() {
