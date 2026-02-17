@@ -73,30 +73,40 @@
         .mh-card:hover { transform: scale(1.05); }
         .mh-card.libre { background: #3b82f6; }
         .mh-card.occupe { background: #ef4444; }
-        .mh-card.electric { box-shadow: 0 0 0 4px #facc15; }
         .mh-card.hidden { display: none; }
         
-        .indicator { 
+        .card-icons {
             position: absolute;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            bottom: 6px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 6px;
+            align-items: center;
         }
-        .gaz-mh { 
-            top: 8px;
-            left: 8px;
-            width: 20px;
-            height: 20px;
+        .card-icons-left {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
+        .icon-badge {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 10px;
+            padding: 1px 4px;
+            font-size: 11px;
+        }
+        .dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.6);
         }
-        .gaz-plancha {
-            top: 8px;
-            right: 8px;
-            width: 20px;
-            height: 16px;
-            border-radius: 3px;
-        }
-        .plein { background: #22c55e; }
-        .vide { background: #f97316; }
+        .dot-plein { background: #22c55e; }
+        .dot-vide { background: #f97316; }
         
         .modal {
             display: none;
@@ -335,10 +345,10 @@
         <img id="photoModalImg" src="" alt="Photo">
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCjHrx4W-udQdIfwIerBD-JoUNHz3-M-Vc",
             authDomain: "gestion-mobilhomes.firebaseapp.com",
@@ -349,8 +359,8 @@
             appId: "1:242018122742:web:f306d2c7ade373f6d2e5d7"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         let data = {};
         let selected = null;
@@ -421,17 +431,17 @@
             // Indicateur de chargement
             document.getElementById('grid').innerHTML = '<p style="text-align:center; color:#166534; grid-column:1/-1; padding:40px;">⏳ Connexion en cours...</p>';
             
-            const dbRef = ref(db, 'mobilhomes');
+            const dbRef = db.ref('mobilhomes');
             
             // Écoute en temps réel : se déclenche à chaque changement
-            onValue(dbRef, (snapshot) => {
+            dbRef.on('value', (snapshot) => {
                 const savedData = snapshot.val();
                 if (savedData) {
                     data = savedData;
                 } else {
                     // Première utilisation : on initialise avec les données par défaut
                     data = getDefaultData();
-                    set(ref(db, 'mobilhomes'), data);
+                    db.ref('mobilhomes').set(data);
                 }
                 updateFilters();
                 render();
@@ -444,7 +454,7 @@
 
         function save() {
             // Sauvegarde en temps réel sur Firebase
-            update(ref(db, 'mobilhomes'), data);
+            db.ref('mobilhomes').update(data);
         }
 
         function updateFilters() {
@@ -492,27 +502,38 @@
                 // Appliquer le filtre
                 const shouldShow = currentFilter === 'Tous' || mh.type === currentFilter;
                 
-                card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${mh.alimentation === 'Électrique' ? 'electric' : ''} ${!shouldShow ? 'hidden' : ''}`;
+                card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${!shouldShow ? 'hidden' : ''}`;
                 card.onclick = () => openModal(num);
                 
+                // Construire les icônes en bas
+                const chauffageGaz = mh.chauffageEau === 'Gaz';
+                const cuissonGaz = mh.cuisson === 'Gaz';
+                const chauffageElec = mh.chauffageEau === 'Électrique';
+                const cuissonElec = mh.cuisson === 'Électrique';
+                // Compatibilité ancien format
+                const ancienGaz = !mh.chauffageEau && mh.alimentation === 'Gaz';
+                const ancienElec = !mh.chauffageEau && mh.alimentation === 'Électrique';
+
+                let iconsLeft = '';
+                if (chauffageGaz || cuissonGaz || ancienGaz) {
+                    const niveau = mh.gazMH === 'Plein' ? 'dot-plein' : 'dot-vide';
+                    iconsLeft += `<span class="icon-badge">🔥<span class="dot ${niveau}"></span></span>`;
+                }
+                if (chauffageElec || cuissonElec || ancienElec) {
+                    iconsLeft += `<span class="icon-badge">⚡</span>`;
+                }
+                const planchaIcon = mh.plancha ? `<span class="icon-badge">🍖<span class="dot ${mh.gazPlancha === 'Plein' ? 'dot-plein' : 'dot-vide'}"></span></span>` : '';
+
                 card.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding-bottom: 20px;">
                         <span style="font-size: 28px;">${num}</span>
-                        ${mh.nom ? `<span style="font-size: 12px; font-weight: 500; opacity: 0.9;">${mh.nom}</span>` : ''}
+                        ${mh.nom ? `<span style="font-size: 11px; font-weight: 500; opacity: 0.9; text-align:center; line-height:1.2;">${mh.nom}</span>` : ''}
+                    </div>
+                    <div class="card-icons">
+                        <div class="card-icons-left">${iconsLeft}</div>
+                        <div>${planchaIcon}</div>
                     </div>
                 `;
-                
-                if (mh.alimentation === 'Gaz') {
-                    const gazIndicator = document.createElement('div');
-                    gazIndicator.className = `indicator gaz-mh ${mh.gazMH === 'Plein' ? 'plein' : 'vide'}`;
-                    card.appendChild(gazIndicator);
-                }
-                
-                if (mh.plancha) {
-                    const planchaIndicator = document.createElement('div');
-                    planchaIndicator.className = `indicator gaz-plancha ${mh.gazPlancha === 'Plein' ? 'plein' : 'vide'}`;
-                    card.appendChild(planchaIndicator);
-                }
                 
                 grid.appendChild(card);
             });
@@ -542,22 +563,35 @@
                 </div>
                 
                 <div class="field">
-                    <label>Alimentation</label>
+                    <label>🚿 Chauffe-eau</label>
                     <div class="btn-grid">
-                        <button class="btn-small ${mh.alimentation === 'Gaz' ? 'btn-orange' : 'btn-gray'}" onclick="setAlimentation('Gaz')">
+                        <button class="btn-small ${(mh.chauffageEau === 'Gaz' || (!mh.chauffageEau && mh.alimentation === 'Gaz')) ? 'btn-orange' : 'btn-gray'}" onclick="setChauffageEau('Gaz')">
                             🔥 Gaz
                         </button>
-                        <button class="btn-small ${mh.alimentation === 'Électrique' ? 'btn-yellow' : 'btn-gray'}" onclick="setAlimentation('Électrique')">
+                        <button class="btn-small ${(mh.chauffageEau === 'Électrique' || (!mh.chauffageEau && mh.alimentation === 'Électrique')) ? 'btn-yellow' : 'btn-gray'}" onclick="setChauffageEau('Électrique')">
                             ⚡ Électrique
                         </button>
                     </div>
                 </div>
-            `;
+                
+                <div class="field">
+                    <label>🍳 Cuisson</label>
+                    <div class="btn-grid">
+                        <button class="btn-small ${(mh.cuisson === 'Gaz' || (!mh.cuisson && mh.alimentation === 'Gaz')) ? 'btn-orange' : 'btn-gray'}" onclick="setCuisson('Gaz')">
+                            🔥 Gaz
+                        </button>
+                        <button class="btn-small ${(mh.cuisson === 'Électrique' || (!mh.cuisson && mh.alimentation === 'Électrique')) ? 'btn-yellow' : 'btn-gray'}" onclick="setCuisson('Électrique')">
+                            ⚡ Électrique
+                        </button>
+                    </div>
+                </div>
+            \`;
             
-            if (mh.alimentation === 'Gaz') {
-                html += `
+            const hasGaz = mh.chauffageEau === 'Gaz' || mh.cuisson === 'Gaz' || (!mh.chauffageEau && mh.alimentation === 'Gaz');
+            if (hasGaz) {
+                html += \`
                     <div class="field">
-                        <label>Niveau gaz mobil-home</label>
+                        <label>🔥 Niveau gaz</label>
                         <div class="btn-grid">
                             <button class="btn-small ${mh.gazMH === 'Plein' ? 'btn-green' : 'btn-gray'}" onclick="setGazMH('Plein')">
                                 🟢 Plein
@@ -567,7 +601,7 @@
                             </button>
                         </div>
                     </div>
-                `;
+                \`;
             }
             
             html += `
@@ -668,8 +702,14 @@
             openModal(selected);
         }
 
-        function setAlimentation(type) {
-            data[selected].alimentation = type;
+        function setChauffageEau(type) {
+            data[selected].chauffageEau = type;
+            save();
+            openModal(selected);
+        }
+
+        function setCuisson(type) {
+            data[selected].cuisson = type;
             save();
             openModal(selected);
         }
@@ -736,6 +776,22 @@
         };
 
         init();
+
+        // Exposer les fonctions globalement (nécessaire avec type="module")
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.toggleOccupe = toggleOccupe;
+        window.setChauffageEau = setChauffageEau;
+        window.setCuisson = setCuisson;
+        window.setGazMH = setGazMH;
+        window.togglePlancha = togglePlancha;
+        window.setGazPlancha = setGazPlancha;
+        window.addPhoto = addPhoto;
+        window.deletePhoto = deletePhoto;
+        window.viewPhoto = viewPhoto;
+        window.closePhotoModal = closePhotoModal;
+        window.filterByType = filterByType;
+
 
     </script>
 </body>
