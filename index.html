@@ -335,90 +335,116 @@
         <img id="photoModalImg" src="" alt="Photo">
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCjHrx4W-udQdIfwIerBD-JoUNHz3-M-Vc",
+            authDomain: "gestion-mobilhomes.firebaseapp.com",
+            databaseURL: "https://gestion-mobilhomes-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "gestion-mobilhomes",
+            storageBucket: "gestion-mobilhomes.firebasestorage.app",
+            messagingSenderId: "242018122742",
+            appId: "1:242018122742:web:f306d2c7ade373f6d2e5d7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         let data = {};
         let selected = null;
         let currentFilter = 'Tous';
 
-        function init() {
-            const saved = localStorage.getItem('camping-mh');
-            if (saved) {
-                data = JSON.parse(saved);
-                // Ajouter les nouvelles propriétés aux données existantes si elles n'existent pas
-                Object.keys(data).forEach(key => {
-                    if (!data[key].marque) data[key].marque = '';
-                    if (!data[key].annee) data[key].annee = '';
-                    if (!data[key].nom) data[key].nom = '';
-                });
-            } else {
-                // Données pré-remplies
-                const mhData = {
-                    1: { nom: 'SILÈNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    2: { nom: 'AZUR', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    3: { nom: 'SABLE', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    4: { nom: 'SALSOLA', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    5: { nom: 'LAGUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    6: { nom: 'DUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    7: { nom: 'MER', type: 'Cottage Cosy 3Ch 6Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    8: { nom: 'OYAT', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    9: { nom: 'GALETS', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    10: { nom: 'OEILLET', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    11: { nom: 'HORIZON', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    12: { nom: 'CIEL ET MER', type: 'Villa Ciel et Mer - 8Pers', marque: 'CISTEBOIS', annee: '2021' },
-                    14: { nom: 'BUTOR', type: 'MH grand confort 2Ch 4Pers', marque: 'RIDEAU', annee: '2015' },
-                    15: { nom: 'TEISSIA', type: 'Chalet grand confort 3Ch 6Pers', marque: 'SAMIBOIS', annee: '' },
-                    16: { nom: 'NEPTUNE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
-                    17: { nom: 'MEREE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
-                    19: { nom: 'CHARDON', type: 'MH Confort 2Ch 4Pers', marque: 'IRM', annee: '2009' },
-                    20: { nom: 'ROSEAU', type: 'MH Confort 2Ch 4Pers', marque: 'RAPID HOME', annee: '2005' },
-                    21: { nom: 'TAMARIS', type: 'MH Confort 2Ch 4Pers', marque: 'SUN ROLLER', annee: '2007' },
-                    23: { nom: 'DIANTHUS', type: 'MH grand confort 2Ch 2sdb 4P', marque: 'RAPID HOME', annee: '2019' },
-                    24: { nom: 'VOLPIE', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
-                    25: { nom: 'CAREX', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
-                    26: { nom: 'MAIA', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
-                    27: { nom: 'JONC', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
-                    28: { nom: 'ALIZÉE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    29: { nom: 'RIVAGE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    30: { nom: 'FLOT', type: 'MH Confort + 2Ch 4Pers', marque: 'RIDEAU', annee: '2013' },
-                    31: { nom: 'PIPIT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
-                    32: { nom: 'BARGE', type: 'MH grand confort 2Ch 4Pers', marque: 'IRM', annee: '2018' },
-                    33: { nom: 'GRAVELOT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
-                    34: { nom: 'MARELIE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    35: { nom: 'OCEAN', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    36: { nom: 'VAGUES', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    37: { nom: 'GORGE BLEUE', type: 'Loggia 3 Ch 5 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    38: { nom: 'PANURE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
-                    39: { nom: 'REMIZ', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' }
+        function getDefaultData() {
+            const mhData = {
+                1: { nom: 'SILÈNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                2: { nom: 'AZUR', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                3: { nom: 'SABLE', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                4: { nom: 'SALSOLA', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                5: { nom: 'LAGUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                6: { nom: 'DUNE', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                7: { nom: 'MER', type: 'Cottage Cosy 3Ch 6Pers', marque: 'CISTEBOIS', annee: '2021' },
+                8: { nom: 'OYAT', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                9: { nom: 'GALETS', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                10: { nom: 'OEILLET', type: 'Cottage Cosy 1Ch 2Pers', marque: 'CISTEBOIS', annee: '2021' },
+                11: { nom: 'HORIZON', type: 'Cottage Cosy 2Ch 4Pers', marque: 'CISTEBOIS', annee: '2021' },
+                12: { nom: 'CIEL ET MER', type: 'Villa Ciel et Mer - 8Pers', marque: 'CISTEBOIS', annee: '2021' },
+                14: { nom: 'BUTOR', type: 'MH grand confort 2Ch 4Pers', marque: 'RIDEAU', annee: '2015' },
+                15: { nom: 'TEISSIA', type: 'Chalet grand confort 3Ch 6Pers', marque: 'SAMIBOIS', annee: '' },
+                16: { nom: 'NEPTUNE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
+                17: { nom: 'MEREE', type: 'MH grand confort 3Ch 6Pers', marque: 'RIDEAU', annee: '2013' },
+                19: { nom: 'CHARDON', type: 'MH Confort 2Ch 4Pers', marque: 'IRM', annee: '2009' },
+                20: { nom: 'ROSEAU', type: 'MH Confort 2Ch 4Pers', marque: 'RAPID HOME', annee: '2005' },
+                21: { nom: 'TAMARIS', type: 'MH Confort 2Ch 4Pers', marque: 'SUN ROLLER', annee: '2007' },
+                23: { nom: 'DIANTHUS', type: 'MH grand confort 2Ch 2sdb 4P', marque: 'RAPID HOME', annee: '2019' },
+                24: { nom: 'VOLPIE', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                25: { nom: 'CAREX', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                26: { nom: 'MAIA', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                27: { nom: 'JONC', type: 'MH grand confort 1Ch 2Pers', marque: 'RAPID HOME', annee: '2019' },
+                28: { nom: 'ALIZÉE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                29: { nom: 'RIVAGE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                30: { nom: 'FLOT', type: 'MH Confort + 2Ch 4Pers', marque: 'RIDEAU', annee: '2013' },
+                31: { nom: 'PIPIT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
+                32: { nom: 'BARGE', type: 'MH grand confort 2Ch 4Pers', marque: 'IRM', annee: '2018' },
+                33: { nom: 'GRAVELOT', type: 'MH grand confort 2Ch 4Pers', marque: 'LOUISIANE', annee: '2016' },
+                34: { nom: 'MARELIE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                35: { nom: 'OCEAN', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                36: { nom: 'VAGUES', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                37: { nom: 'GORGE BLEUE', type: 'Loggia 3 Ch 5 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                38: { nom: 'PANURE', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' },
+                39: { nom: 'REMIZ', type: 'Loggia 2 Ch 4 Pers', marque: 'FABRE', annee: '2012 RELOOKE 2023' }
+            };
+            const defaultData = {};
+            for (let i = 1; i <= 39; i++) {
+                if (i === 13 || i === 18 || i === 22) continue;
+                const info = mhData[i] || { nom: '', type: '', marque: '', annee: '' };
+                defaultData[i] = {
+                    numero: i,
+                    type: info.type,
+                    marque: info.marque,
+                    annee: info.annee,
+                    nom: info.nom,
+                    occupe: false,
+                    alimentation: 'Gaz',
+                    gazMH: 'Plein',
+                    plancha: false,
+                    gazPlancha: 'Plein',
+                    notes: '',
+                    photos: []
                 };
-                
-                for (let i = 1; i <= 39; i++) {
-                    if (i === 13 || i === 18 || i === 22) continue; // Résidents et hébergement saisonnier
-                    
-                    const info = mhData[i] || { nom: '', type: '', marque: '', annee: '' };
-                    
-                    data[i] = {
-                        numero: i,
-                        type: info.type,
-                        marque: info.marque,
-                        annee: info.annee,
-                        nom: info.nom,
-                        occupe: false,
-                        alimentation: 'Gaz',
-                        gazMH: 'Plein',
-                        plancha: false,
-                        gazPlancha: 'Plein',
-                        notes: '',
-                        photos: []
-                    };
-                }
-                save();
             }
-            updateFilters();
-            render();
+            return defaultData;
+        }
+
+        function init() {
+            // Indicateur de chargement
+            document.getElementById('grid').innerHTML = '<p style="text-align:center; color:#166534; grid-column:1/-1; padding:40px;">⏳ Connexion en cours...</p>';
+            
+            const dbRef = ref(db, 'mobilhomes');
+            
+            // Écoute en temps réel : se déclenche à chaque changement
+            onValue(dbRef, (snapshot) => {
+                const savedData = snapshot.val();
+                if (savedData) {
+                    data = savedData;
+                } else {
+                    // Première utilisation : on initialise avec les données par défaut
+                    data = getDefaultData();
+                    set(ref(db, 'mobilhomes'), data);
+                }
+                updateFilters();
+                render();
+                // Si un modal est ouvert, le rafraîchir
+                if (selected && document.getElementById('modal').classList.contains('show')) {
+                    openModal(selected);
+                }
+            });
         }
 
         function save() {
-            localStorage.setItem('camping-mh', JSON.stringify(data));
+            // Sauvegarde en temps réel sur Firebase
+            update(ref(db, 'mobilhomes'), data);
         }
 
         function updateFilters() {
@@ -711,14 +737,6 @@
 
         init();
 
-        // Enregistrement du Service Worker pour PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker enregistré'))
-                    .catch(err => console.log('Erreur Service Worker:', err));
-            });
-        }
     </script>
 </body>
 </html>
