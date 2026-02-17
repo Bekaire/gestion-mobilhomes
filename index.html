@@ -463,17 +463,21 @@
                 dbRef.on('value', (snapshot) => {
                     clearTimeout(fallbackTimer);
                     const savedData = snapshot.val();
+                    console.log('Firebase data reçue:', savedData ? Object.keys(savedData).length + ' clés' : 'null');
                     if (savedData) {
                         data = parseFirebaseData(savedData);
+                        console.log('Data parsée:', Object.keys(data).length + ' mobil-homes');
                         localStorage.setItem('camping-mh-backup', JSON.stringify(data));
                         // Réécrire proprement si c'était un tableau
                         if (Array.isArray(savedData)) {
                             saveToFirebase();
                         }
                     } else {
+                        console.log('Pas de data, création par défaut');
                         data = getDefaultData();
                         saveToFirebase();
                     }
+                    console.log('Avant render, data:', Object.keys(data));
                     updateFilters();
                     render();
                     if (selected && document.getElementById('modal').classList.contains('show')) {
