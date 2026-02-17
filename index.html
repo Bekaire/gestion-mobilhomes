@@ -345,10 +345,10 @@
         <img id="photoModalImg" src="" alt="Photo">
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCjHrx4W-udQdIfwIerBD-JoUNHz3-M-Vc",
             authDomain: "gestion-mobilhomes.firebaseapp.com",
@@ -359,8 +359,8 @@
             appId: "1:242018122742:web:f306d2c7ade373f6d2e5d7"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         let data = {};
         let selected = null;
@@ -431,17 +431,17 @@
             // Indicateur de chargement
             document.getElementById('grid').innerHTML = '<p style="text-align:center; color:#166534; grid-column:1/-1; padding:40px;">⏳ Connexion en cours...</p>';
             
-            const dbRef = ref(db, 'mobilhomes');
+            const dbRef = db.ref('mobilhomes');
             
             // Écoute en temps réel : se déclenche à chaque changement
-            onValue(dbRef, (snapshot) => {
+            dbRef.on('value', (snapshot) => {
                 const savedData = snapshot.val();
                 if (savedData) {
                     data = savedData;
                 } else {
                     // Première utilisation : on initialise avec les données par défaut
                     data = getDefaultData();
-                    set(ref(db, 'mobilhomes'), data);
+                    db.ref('mobilhomes').set(data);
                 }
                 updateFilters();
                 render();
@@ -454,7 +454,7 @@
 
         function save() {
             // Sauvegarde en temps réel sur Firebase
-            update(ref(db, 'mobilhomes'), data);
+            db.ref('mobilhomes').update(data);
         }
 
         function updateFilters() {
@@ -791,6 +791,7 @@
         window.viewPhoto = viewPhoto;
         window.closePhotoModal = closePhotoModal;
         window.filterByType = filterByType;
+
 
     </script>
 </body>
