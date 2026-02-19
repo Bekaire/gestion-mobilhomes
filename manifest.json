@@ -1,7 +1,7 @@
 {
-  "name": "Gestion Mobil-Homes",
-  "short_name": "MH Gestion",
-  "description": "Application de gestion de mobil-homes",
+  "name": "Le Bellevue",
+  "short_name": "Bellevue",
+  "description": "Gestion des mobil-homes - Le Bellevue",
   "start_url": "/gestion-mobilhomes/",
   "scope": "/gestion-mobilhomes/",
   "display": "standalone",
