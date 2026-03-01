@@ -509,6 +509,7 @@
                     if (savedData) {
                         data = parseFirebaseData(savedData);
                         console.log('Data parsée:', Object.keys(data).length + ' mobil-homes');
+                        patchMissingFields();
                         localStorage.setItem('camping-mh-backup', JSON.stringify(data));
                         // Réécrire proprement si c'était un tableau
                         if (Array.isArray(savedData)) {
@@ -536,6 +537,36 @@
             }
         }
 
+        // Corrige les types/noms manquants en se basant sur les données par défaut
+        function patchMissingFields() {
+            const defaults = getDefaultData();
+            let changed = false;
+            Object.keys(defaults).forEach(num => {
+                if (data[num]) {
+                    if (!data[num].type || data[num].type.trim() === '') {
+                        data[num].type = defaults[num].type;
+                        changed = true;
+                    }
+                    if (!data[num].nom || data[num].nom.trim() === '') {
+                        data[num].nom = defaults[num].nom;
+                        changed = true;
+                    }
+                    if (!data[num].marque || data[num].marque.trim() === '') {
+                        data[num].marque = defaults[num].marque;
+                        changed = true;
+                    }
+                    if (!data[num].annee || data[num].annee.trim() === '') {
+                        data[num].annee = defaults[num].annee;
+                        changed = true;
+                    }
+                }
+            });
+            if (changed) {
+                console.log('Champs manquants corrigés, sauvegarde...');
+                save();
+            }
+        }
+
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('camping-mh-backup');
             if (saved) {
@@ -544,6 +575,7 @@
                 data = getDefaultData();
                 localStorage.setItem('camping-mh-backup', JSON.stringify(data));
             }
+            patchMissingFields();
             updateFilters();
             render();
         }
