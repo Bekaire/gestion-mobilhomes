@@ -365,6 +365,7 @@
     <h1>Le Bellevue</h1>
     
     <button class="toggle-gammes-btn" id="toggleGammesBtn" onclick="toggleGammes()">🏷️ Filtrer par gamme</button>
+    <button class="toggle-gammes-btn" onclick="repairAllTypes()" style="background:#fff3cd;border-color:#f59e0b;color:#92400e;font-size:0.8em;padding:6px 14px;">🔧 Réparer les gammes</button>
     
     <div class="filters" id="filters">
     </div>
@@ -599,6 +600,28 @@
             localStorage.setItem('camping-mh-backup', JSON.stringify(data));
             saveToFirebase();
         }
+
+        // Force la réécriture de TOUS les types/noms/marques depuis les données par défaut
+        function repairAllTypes() {
+            const defaults = getDefaultData();
+            let count = 0;
+            // Parcourir toutes les clés de data (qui peuvent être strings)
+            Object.keys(data).forEach(k => {
+                const num = parseInt(k);
+                if (defaults[num]) {
+                    data[k].type = defaults[num].type;
+                    data[k].nom = defaults[num].nom;
+                    data[k].marque = defaults[num].marque;
+                    count++;
+                }
+            });
+            console.log('Réparation: ' + count + ' MH mis à jour');
+            saveToFirebase();
+            updateFilters();
+            render();
+            alert(count + ' mobil-homes réparés ! Les gammes sont maintenant correctes.');
+        }
+        window.repairAllTypes = repairAllTypes;
 
         function updateFilters() {
             const types = new Set();
