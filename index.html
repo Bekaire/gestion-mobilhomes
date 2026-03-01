@@ -541,29 +541,33 @@
         function patchMissingFields() {
             const defaults = getDefaultData();
             let changed = false;
-            Object.keys(defaults).forEach(num => {
-                if (data[num]) {
-                    if (!data[num].type || data[num].type.trim() === '') {
-                        data[num].type = defaults[num].type;
+            Object.keys(defaults).forEach(numKey => {
+                // Les clés dans data peuvent être strings ou numbers, on teste les deux
+                const mh = data[numKey] || data[String(numKey)] || data[Number(numKey)];
+                const key = data[numKey] !== undefined ? numKey : (data[String(numKey)] !== undefined ? String(numKey) : null);
+                if (mh && key !== null) {
+                    if (!mh.type || mh.type.trim() === '') {
+                        data[key].type = defaults[numKey].type;
+                        changed = true;
+                        console.log('Patch type MH', key, '->', defaults[numKey].type);
+                    }
+                    if (!mh.nom || mh.nom.trim() === '') {
+                        data[key].nom = defaults[numKey].nom;
                         changed = true;
                     }
-                    if (!data[num].nom || data[num].nom.trim() === '') {
-                        data[num].nom = defaults[num].nom;
+                    if (!mh.marque || mh.marque.trim() === '') {
+                        data[key].marque = defaults[numKey].marque;
                         changed = true;
                     }
-                    if (!data[num].marque || data[num].marque.trim() === '') {
-                        data[num].marque = defaults[num].marque;
-                        changed = true;
-                    }
-                    if (!data[num].annee || data[num].annee.trim() === '') {
-                        data[num].annee = defaults[num].annee;
+                    if (!mh.annee || mh.annee.trim() === '') {
+                        data[key].annee = defaults[numKey].annee;
                         changed = true;
                     }
                 }
             });
             if (changed) {
                 console.log('Champs manquants corrigés, sauvegarde...');
-                save();
+                saveToFirebase();
             }
         }
 
