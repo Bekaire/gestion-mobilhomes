@@ -605,27 +605,53 @@
         function repairAllTypes() {
             const defaults = getDefaultData();
             let count = 0;
-            // Parcourir toutes les clés de data (qui peuvent être strings)
-            Object.keys(data).forEach(k => {
-                const num = parseInt(k);
-                if (defaults[num]) {
-                    data[k].type = defaults[num].type;
-                    data[k].nom = defaults[num].nom;
-                    data[k].marque = defaults[num].marque;
+            
+            console.log('=== REPAIR DEBUG ===');
+            console.log('Clés dans data:', Object.keys(data));
+            console.log('Clés dans defaults:', Object.keys(defaults));
+            console.log('Exemple data[1]:', data[1]);
+            console.log('Exemple data["1"]:', data["1"]);
+            console.log('Exemple defaults[1]:', defaults[1]);
+            
+            // On reconstruit data entièrement depuis les defaults en conservant les infos saisies
+            const newData = {};
+            Object.keys(defaults).forEach(numKey => {
+                const num = parseInt(numKey);
+                // Chercher la clé dans data sous toutes les formes possibles
+                const existing = data[num] || data[String(num)] || data[numKey];
+                if (existing) {
+                    newData[num] = {
+                        ...existing,
+                        numero: num,
+                        type: defaults[numKey].type,
+                        nom: defaults[numKey].nom,
+                        marque: defaults[numKey].marque,
+                    };
+                    count++;
+                } else {
+                    // MH pas encore dans Firebase, on l'ajoute
+                    newData[num] = { ...defaults[numKey] };
                     count++;
                 }
             });
-            console.log('Réparation: ' + count + ' MH mis à jour');
+            
+            data = newData;
+            console.log('Après réparation, exemple data[14]:', data[14]);
+            console.log('Types distincts:', [...new Set(Object.values(data).map(m => m.type))]);
+            
             saveToFirebase();
             updateFilters();
             render();
-            alert(count + ' mobil-homes réparés ! Les gammes sont maintenant correctes.');
+            alert(count + ' mobil-homes réparés !');
         }
         window.repairAllTypes = repairAllTypes;
 
         function updateFilters() {
+            // On lit TOUJOURS les gammes depuis les données par défaut du code
+            // pour ne pas dépendre de ce qui est (ou n'est pas) dans Firebase
+            const defaults = getDefaultData();
             const types = new Set();
-            Object.values(data).forEach(mh => {
+            Object.values(defaults).forEach(mh => {
                 if (mh.type && mh.type.trim()) {
                     types.add(mh.type);
                 }
@@ -661,12 +687,14 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             
+            const defaults = getDefaultData();
             Object.keys(data).forEach(num => {
                 const mh = data[num];
                 const card = document.createElement('div');
                 
-                // Appliquer le filtre
-                const shouldShow = currentFilter === '' || mh.type === currentFilter;
+                // Appliquer le filtre : on utilise le type du default si celui de data est vide
+                const effectiveType = (mh.type && mh.type.trim()) ? mh.type : (defaults[parseInt(num)] ? defaults[parseInt(num)].type : '');
+                const shouldShow = currentFilter === '' || effectiveType === currentFilter;
                 
                 card.className = `mh-card ${mh.occupe ? 'occupe' : 'libre'} ${!shouldShow ? 'hidden' : ''}`;
                 card.onclick = () => openModal(num);
