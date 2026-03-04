@@ -535,8 +535,32 @@ window.addEventListener('resize', () => {
   resizeMap();
 });
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => { fixBodyHeight(); checkOrientation(); resizeMap(); }, 400);
+  setTimeout(() => {
+    fixBodyHeight();
+    checkOrientation();
+    resizeMap();
+    // Si on passe en paysage, activer plein écran automatiquement
+    const isLandscape = window.innerWidth > window.innerHeight;
+    if(isLandscape) {
+      const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      if(!inFs) enterFullscreenLandscape();
+    }
+  }, 400);
 });
+
+// Aussi détecter via screen.orientation si dispo
+if(screen.orientation) {
+  screen.orientation.addEventListener('change', () => {
+    setTimeout(() => {
+      fixBodyHeight(); checkOrientation(); resizeMap();
+      const isLandscape = screen.orientation.type.startsWith('landscape');
+      if(isLandscape) {
+        const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        if(!inFs) enterFullscreenLandscape();
+      }
+    }, 300);
+  });
+}
 
 function checkOrientation() {
   const isPortrait = window.innerHeight > window.innerWidth;
