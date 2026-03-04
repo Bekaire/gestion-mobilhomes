@@ -254,32 +254,13 @@ body.editing .edit-hint { display:block; }
 .pp-photos { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
 .pp-photo { aspect-ratio:1; border-radius:10px; overflow:hidden; position:relative; background:#f3f4f6; }
 .pp-photo img { width:100%; height:100%; object-fit:cover; cursor:pointer; display:block; }
-.pp-photo .del-ph {
+.del-ph-btn {
   position:absolute; top:4px; right:4px;
   background:#ef4444; color:white; border:none;
-  border-radius:50%; width:24px; height:24px; font-size:15px;
-  display:none; align-items:center; justify-content:center; cursor:pointer;
+  border-radius:50%; width:26px; height:26px; font-size:16px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
 }
-body.editing .del-ph { display:flex; }
-
-.add-photo-lbl {
-  display:none; align-items:center; justify-content:center; gap:8px;
-  padding:11px; border:2px dashed #16a34a; border-radius:10px;
-  font-size:14px; font-weight:600; color:#16a34a; cursor:pointer; margin-bottom:14px;
-}
-body.editing .add-photo-lbl { display:flex; }
-#ppPhotoInput { display:none; }
-
-.edit-section { display:none; }
-body.editing .edit-section { display:block; }
-
-.del-pt-btn {
-  width:100%; padding:13px; border-radius:10px; border:none;
-  background:#fef2f2; color:#ef4444;
-  font-family:inherit; font-size:15px; font-weight:700;
-  cursor:pointer; margin-top:6px; display:none;
-}
-body.editing .del-pt-btn { display:block; }
 
 /* Cat modal */
 .emoji-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
@@ -921,28 +902,46 @@ function openDetail(p) {
   h += `<div class="pp-title">${p.label}</div>`;
   h += p.desc ? `<div class="pp-desc">${p.desc}</div>` : `<div class="pp-nodesc">Aucune description</div>`;
 
+  // Photos
   if(p.photos && p.photos.length) {
     h += `<div class="pp-photos">`;
     p.photos.forEach((url,i) => {
       h += `<div class="pp-photo">
         <img src="${url}" onclick="openViewer('${url}')">
-        <button class="del-ph" onclick="doDelPhoto(${i})">×</button>
+        ${editing ? `<button class="del-ph-btn" onclick="doDelPhoto(${i})">×</button>` : ''}
       </div>`;
     });
     h += `</div>`;
   }
 
-  h += `<label class="add-photo-lbl" for="ppPhotoInput">📷 Ajouter des photos</label>
-        <input type="file" id="ppPhotoInput" accept="image/*" multiple onchange="doAddPhoto(event)">`;
+  if(editing) {
+    // Add photo
+    h += `<label style="display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px;border:2px dashed #16a34a;border-radius:10px;
+      font-size:14px;font-weight:600;color:#16a34a;cursor:pointer;margin-bottom:14px;"
+      for="ppPhotoInput">📷 Ajouter des photos</label>
+      <input type="file" id="ppPhotoInput" accept="image/*" multiple onchange="doAddPhoto(event)" style="display:none">`;
 
-  h += `<div class="edit-section">
-    <label class="flabel" style="margin-top:4px">✏️ Modifier</label>
-    <input class="finput" id="ppName" type="text" value="${p.label.replace(/"/g,'&quot;')}" maxlength="40" autocomplete="off">
-    <textarea class="ftextarea" id="ppDesc" placeholder="Description...">${p.desc||''}</textarea>
-    <button class="gbtn ok" style="width:100%;margin-bottom:10px" onclick="doSaveDetail()">💾 Sauvegarder</button>
-  </div>`;
+    // Edit name + desc
+    h += `<hr style="border:none;border-top:2px solid #dcfce7;margin:4px 0 14px">`;
+    h += `<label class="flabel">✏️ Modifier le nom</label>
+      <input class="finput" id="ppName" type="text" value="${p.label.replace(/"/g,'&quot;')}" maxlength="40" autocomplete="off">
+      <label class="flabel">Description</label>
+      <textarea class="ftextarea" id="ppDesc" placeholder="Description...">${p.desc||''}</textarea>
+      <button class="gbtn ok" style="width:100%;margin-bottom:10px" onclick="doSaveDetail()">💾 Sauvegarder les modifications</button>`;
 
-  h += `<button class="del-pt-btn" onclick="doDelPoint()">🗑️ Supprimer ce point</button>`;
+    // Delete — always visible in edit mode, styled clearly
+    h += `<button onclick="doDelPoint()" style="
+      width:100%;padding:13px;border-radius:10px;border:2px solid #ef4444;
+      background:#fef2f2;color:#ef4444;font-family:inherit;
+      font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;">
+      🗑️ Supprimer ce point</button>`;
+  } else {
+    // Read mode: just show add photo option
+    if(p.photos && p.photos.length) {
+      h += `<p style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:8px">Appuyez sur une photo pour l'agrandir</p>`;
+    }
+  }
 
   document.getElementById('detailBody').innerHTML = h;
   document.getElementById('detailOverlay').classList.add('show');
