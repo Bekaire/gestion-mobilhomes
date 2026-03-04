@@ -6,437 +6,240 @@
 <meta name="theme-color" content="#16a34a">
 <title>Infrastructure - Le Bellevue</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0fdf4;height:100dvh;overflow:hidden;display:flex;flex-direction:column;color:#111;}
 
-body {
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#f0fdf4;
-  height:100vh;
-  height:100dvh;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  color:#111;
-}
+/* HEADER */
+.hdr{background:#16a34a;color:#fff;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(22,101,52,.3);}
+.hdr-l{display:flex;align-items:center;gap:8px;}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.back-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:22px;font-weight:bold;}
+.hdr h1{font-size:17px;font-weight:700;}
+.fs-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:34px;height:34px;border-radius:8px;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.edit-btn{background:#fff;color:#16a34a;border:none;padding:8px 13px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.edit-btn.on{background:#facc15;color:#166534;}
 
-/* ── HEADER ── */
-.header {
-  background:#16a34a; color:white;
-  padding:12px 16px;
-  display:flex; align-items:center; justify-content:space-between;
-  flex-shrink:0;
-  box-shadow:0 2px 8px rgba(22,101,52,0.3);
-}
-.header-left { display:flex; align-items:center; gap:10px; }
-.back-btn {
-  background:rgba(255,255,255,0.2); border:none; color:white;
-  width:34px; height:34px; border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  text-decoration:none; font-size:22px; font-weight:bold;
-}
-.header h1 { font-size:18px; font-weight:700; }
-.edit-btn {
-  background:white; color:#16a34a; border:none;
-  padding:8px 14px; border-radius:8px;
-  font-family:inherit; font-size:14px; font-weight:700;
-  cursor:pointer; display:flex; align-items:center; gap:5px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.15);
-}
-.edit-btn.active { background:#facc15; color:#166534; }
-.fs-btn {
-  background:rgba(255,255,255,0.2); border:none; color:white;
-  width:34px; height:34px; border-radius:8px; font-size:18px;
-  display:flex; align-items:center; justify-content:center; cursor:pointer;
-}
+/* CATEGORIES */
+.cats{background:#fff;border-bottom:2px solid #dcfce7;display:flex;align-items:center;gap:7px;padding:8px 12px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;}
+.cats::-webkit-scrollbar{display:none;}
+.pill{display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:20px;border:2px solid #d1d5db;background:#fff;cursor:pointer;white-space:nowrap;font-size:12px;font-weight:600;color:#374151;flex-shrink:0;}
+.pill.sel{color:#fff;border-color:transparent;}
+.pill .n{background:rgba(0,0,0,.12);border-radius:10px;padding:1px 6px;font-size:11px;}
+.pill-ebts{display:none;align-items:center;gap:2px;margin-left:2px;}
+.editing .pill-ebts{display:flex;}
+.pebt{width:20px;height:20px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;}
+.pebt.e{background:rgba(0,0,0,.1);color:#374151;}
+.pill.sel .pebt.e{background:rgba(255,255,255,.3);color:#fff;}
+.pebt.d{background:rgba(239,68,68,.15);color:#ef4444;}
+.add-pill{display:none;align-items:center;gap:5px;padding:6px 11px;border-radius:20px;border:2px dashed #16a34a;background:#fff;cursor:pointer;white-space:nowrap;font-size:12px;font-weight:700;color:#16a34a;flex-shrink:0;}
+.editing .add-pill{display:flex;}
 
-/* ── CATEGORIES ── */
-.cats-bar {
-  background:white; border-bottom:2px solid #dcfce7;
-  display:flex; align-items:center; gap:8px; padding:8px 12px;
-  overflow-x:auto; flex-shrink:0; scrollbar-width:none;
-}
-.cats-bar::-webkit-scrollbar { display:none; }
-.cat-pill {
-  display:flex; align-items:center; gap:5px;
-  padding:7px 12px; border-radius:20px;
-  border:2px solid #d1d5db; background:white;
-  cursor:pointer; white-space:nowrap;
-  font-size:13px; font-weight:600; color:#374151; flex-shrink:0;
-}
-.cat-pill.active { color:white; border-color:transparent; }
-.cat-pill .cnt {
-  background:rgba(0,0,0,0.12); border-radius:10px;
-  padding:1px 6px; font-size:11px;
-}
-.pill-edit-btns { display:none; align-items:center; gap:2px; margin-left:3px; }
-body.editing .pill-edit-btns { display:flex; }
-.pill-btn {
-  width:20px; height:20px; border-radius:50%; border:none;
-  display:flex; align-items:center; justify-content:center;
-  font-size:10px; cursor:pointer;
-}
-.pill-btn.e { background:rgba(0,0,0,0.1); color:#374151; }
-.cat-pill.active .pill-btn.e { background:rgba(255,255,255,0.3); color:white; }
-.pill-btn.d { background:rgba(239,68,68,0.15); color:#ef4444; }
-.cat-add-pill {
-  display:none; align-items:center; gap:5px;
-  padding:7px 12px; border-radius:20px;
-  border:2px dashed #16a34a; background:white;
-  cursor:pointer; white-space:nowrap;
-  font-size:13px; font-weight:700; color:#16a34a; flex-shrink:0;
-}
-body.editing .cat-add-pill { display:flex; }
+/* MAP */
+.map-area{flex:1;position:relative;overflow:hidden;background:#e8f5e9;}
+#mapWrap{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;}
+#mapEl{position:relative;display:block;}
+#mapEl img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;}
+.map-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#16a34a;width:100%;height:100%;min-height:200px;}
+.map-empty .ico{font-size:56px;}
+.map-empty p{font-size:15px;font-weight:700;}
+.map-empty small{font-size:12px;color:#86efac;}
+.upload-fab{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid #16a34a;border-radius:20px;padding:7px 15px;font-size:13px;font-weight:600;color:#166534;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:20;white-space:nowrap;}
+#mapFile{display:none;}
+.edit-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#facc15;color:#166534;padding:8px 16px;border-radius:30px;font-size:12px;font-weight:700;z-index:20;display:none;white-space:nowrap;pointer-events:none;}
+.editing .edit-hint{display:block;}
+.zoom-btns{position:absolute;right:12px;bottom:14px;display:flex;flex-direction:column;gap:5px;z-index:20;}
+.zbtn{width:40px;height:40px;background:rgba(255,255,255,.92);border:none;border-radius:10px;color:#166534;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);user-select:none;}
 
-/* ── MAP AREA ── */
-.map-area {
-  flex:1; position:relative; overflow:hidden;
-  background:#e8f5e9;
-  display:flex; align-items:center; justify-content:center;
-}
+/* PINS */
+.pin-wrap{position:absolute;transform:translate(-50%,-100%);cursor:pointer;z-index:10;}
+.pin{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,.6);box-shadow:0 3px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.pin-i{transform:rotate(45deg);}
 
-/* The map image fills the area, no crop */
-#mapImg {
-  position:relative;
-  display:block;
-  /* sized by JS */
-}
-#mapImg img {
-  display:block;
-  width:100%; height:100%;
-  user-select:none; -webkit-user-select:none;
-  pointer-events:none;
-}
+/* BOTTOM SHEET */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.ov.show{opacity:1;pointer-events:all;}
+.sheet{background:#f0fdf4;border-radius:20px 20px 0 0;width:100%;max-width:520px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:88dvh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,.2);}
+.ov.show .sheet{transform:translateY(0);}
+.sh-handle{width:40px;height:4px;background:#d1d5db;border-radius:4px;margin:10px auto 0;}
+.sh-head{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;background:#16a34a;color:#fff;position:sticky;top:0;z-index:5;}
+.sh-head h3{font-size:16px;font-weight:700;}
+.sh-x{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.sh-body{padding:16px 18px 36px;}
 
+/* FORM */
+.flbl{font-size:12px;font-weight:600;color:#166534;margin-bottom:6px;display:block;}
+.fin{width:100%;padding:11px;border:2px solid #d1d5db;border-radius:10px;font-size:16px;font-family:inherit;outline:none;background:#fff;color:#111;-webkit-text-fill-color:#111;margin-bottom:12px;}
+.fin:focus{border-color:#16a34a;}
+.fta{width:100%;padding:11px;border:2px solid #d1d5db;border-radius:10px;font-size:15px;font-family:inherit;outline:none;background:#fff;color:#111;-webkit-text-fill-color:#111;resize:none;min-height:75px;margin-bottom:12px;}
+.fta:focus{border-color:#16a34a;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{padding:13px;border-radius:10px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+.btn.ok{background:#16a34a;color:#fff;}
+.btn.cancel{background:#e5e7eb;color:#374151;}
+.btn.red{background:#fef2f2;color:#ef4444;border:2px solid #ef4444;width:100%;margin-top:6px;}
 
+/* DETAIL */
+.dp-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;color:#fff;font-size:12px;font-weight:700;margin-bottom:10px;}
+.dp-title{font-size:19px;font-weight:700;color:#166534;margin-bottom:7px;}
+.dp-desc{font-size:14px;color:#374151;margin-bottom:14px;white-space:pre-wrap;line-height:1.5;}
+.dp-nodesc{font-size:13px;color:#9ca3af;margin-bottom:14px;font-style:italic;}
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.photo-item{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;background:#f3f4f6;}
+.photo-item img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;}
+.photo-del{position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.add-ph-lbl{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border:2px dashed #16a34a;border-radius:10px;font-size:14px;font-weight:600;color:#16a34a;cursor:pointer;margin-bottom:12px;}
+.divider{border:none;border-top:2px solid #dcfce7;margin:8px 0 14px;}
 
-/* Empty state */
-.map-empty {
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:14px; color:#16a34a;
-  width:100%; height:100%;
-}
-.map-empty .big { font-size:60px; }
-.map-empty p { font-size:16px; font-weight:700; }
-.map-empty small { font-size:13px; color:#86efac; }
+/* CAT MODAL */
+.emojis{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.emj{width:40px;height:40px;border-radius:10px;border:2px solid #e5e7eb;background:#fff;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.emj.sel{border-color:#16a34a;background:#dcfce7;}
+.colors{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px;}
+.clr{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;}
+.clr.sel{border-color:#166534;outline:2px solid #166534;outline-offset:2px;}
 
-/* Zoom buttons */
-.zoom-btns {
-  position:absolute; right:12px; bottom:16px;
-  display:flex; flex-direction:column; gap:6px; z-index:20;
-}
-.zbtn {
-  width:42px; height:42px; background:rgba(255,255,255,0.92);
-  border:none; border-radius:10px; color:#166534;
-  font-size:24px; font-weight:700;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);
-  user-select:none; -webkit-user-select:none;
-}
-.zbtn:active { background:#dcfce7; }
-
-/* Upload btn */
-.upload-fab {
-  position:absolute; top:12px; left:50%; transform:translateX(-50%);
-  background:white; border:2px solid #16a34a; border-radius:20px;
-  padding:8px 16px; font-size:13px; font-weight:600; color:#166534;
-  cursor:pointer; display:flex; align-items:center; gap:6px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:20; white-space:nowrap;
-}
-#mapFileInput { display:none; }
-
-/* Edit hint banner */
-.edit-hint {
-  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
-  background:#facc15; color:#166534;
-  padding:9px 18px; border-radius:30px;
-  font-size:13px; font-weight:700; z-index:20;
-  display:none; white-space:nowrap;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15); pointer-events:none;
-}
-body.editing .edit-hint { display:block; }
-
-/* ── POINTS ── */
-.point {
-  position:absolute;
-  transform:translate(-50%, -100%);
-  cursor:pointer; z-index:10;
-}
-.pin {
-  width:32px; height:32px;
-  border-radius:50% 50% 50% 0; transform:rotate(-45deg);
-  border:2px solid rgba(255,255,255,.6);
-  box-shadow:0 3px 10px rgba(0,0,0,0.35);
-  display:flex; align-items:center; justify-content:center;
-  font-size:15px;
-}
-.pin-inner { transform:rotate(45deg); }
-.point:active .pin { transform:rotate(-45deg) scale(1.15); }
-
-/* ── BOTTOM SHEETS ── */
-.overlay {
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.5);
-  z-index:1000;
-  display:flex; align-items:flex-end; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .25s;
-}
-.overlay.show { opacity:1; pointer-events:all; }
-
-.sheet {
-  background:#f0fdf4;
-  border-radius:20px 20px 0 0;
-  width:100%; max-width:520px;
-  transform:translateY(100%);
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
-  max-height:85dvh; overflow-y:auto;
-  box-shadow:0 -4px 24px rgba(0,0,0,0.2);
-  color:#111;
-}
-.overlay.show .sheet { transform:translateY(0); }
-
-.sheet-handle {
-  width:40px; height:4px; background:#d1d5db;
-  border-radius:4px; margin:10px auto 0;
-}
-.sheet-head {
-  padding:14px 20px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:#16a34a; color:white;
-  position:sticky; top:0; z-index:5;
-}
-.sheet-head h3 { font-size:17px; font-weight:700; }
-.sheet-x {
-  background:rgba(255,255,255,0.2); border:none; color:white;
-  width:30px; height:30px; border-radius:50%;
-  font-size:18px; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; flex-shrink:0;
-}
-.sheet-body { padding:18px 20px 40px; }
-
-.flabel { font-size:13px; font-weight:600; color:#166534; margin-bottom:7px; display:block; }
-.finput {
-  width:100%; padding:12px;
-  border:2px solid #d1d5db; border-radius:10px;
-  font-size:16px; font-family:inherit;
-  outline:none; background:white;
-  color:#111 !important; -webkit-text-fill-color:#111 !important;
-  margin-bottom:14px;
-}
-.finput:focus { border-color:#16a34a; }
-.ftextarea {
-  width:100%; padding:12px;
-  border:2px solid #d1d5db; border-radius:10px;
-  font-size:15px; font-family:inherit;
-  outline:none; background:white;
-  color:#111 !important; -webkit-text-fill-color:#111 !important;
-  resize:none; min-height:80px; margin-bottom:14px;
-}
-.ftextarea:focus { border-color:#16a34a; }
-
-.row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.gbtn {
-  padding:13px; border-radius:10px; border:none;
-  font-family:inherit; font-size:15px; font-weight:700; cursor:pointer;
-}
-.gbtn.cancel { background:#e5e7eb; color:#374151; }
-.gbtn.ok { background:#16a34a; color:white; }
-
-/* Point detail */
-.pp-badge {
-  display:inline-flex; align-items:center; gap:5px;
-  padding:4px 12px; border-radius:20px; color:white;
-  font-size:12px; font-weight:700; margin-bottom:12px;
-}
-.pp-title { font-size:20px; font-weight:700; color:#166534; margin-bottom:8px; }
-.pp-desc { font-size:14px; color:#374151; margin-bottom:16px; white-space:pre-wrap; line-height:1.5; }
-.pp-nodesc { font-size:13px; color:#9ca3af; margin-bottom:16px; font-style:italic; }
-
-.pp-photos { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
-.pp-photo { aspect-ratio:1; border-radius:10px; overflow:hidden; position:relative; background:#f3f4f6; }
-.pp-photo img { width:100%; height:100%; object-fit:cover; cursor:pointer; display:block; }
-.del-ph-btn {
-  position:absolute; top:4px; right:4px;
-  background:#ef4444; color:white; border:none;
-  border-radius:50%; width:26px; height:26px; font-size:16px;
-  display:flex; align-items:center; justify-content:center; cursor:pointer;
-  box-shadow:0 1px 4px rgba(0,0,0,0.3);
-}
-
-/* Cat modal */
-.emoji-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
-.emj {
-  width:42px; height:42px; border-radius:10px;
-  border:2px solid #e5e7eb; background:white;
-  font-size:20px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-}
-.emj.sel { border-color:#16a34a; background:#dcfce7; }
-.color-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-.clr {
-  width:34px; height:34px; border-radius:50%;
-  border:3px solid transparent; cursor:pointer;
-}
-.clr.sel { border-color:#166534; outline:2px solid #166534; outline-offset:2px; }
-
-/* Photo viewer */
-.photo-viewer {
-  position:fixed; inset:0; background:rgba(0,0,0,0.93);
-  z-index:2000; display:none; align-items:center; justify-content:center;
-}
-.photo-viewer.show { display:flex; }
-.photo-viewer img { max-width:96vw; max-height:90dvh; border-radius:8px; object-fit:contain; }
-.pv-close {
-  position:absolute; top:16px; right:16px;
-  background:rgba(255,255,255,0.15); border:none; color:white;
-  width:42px; height:42px; border-radius:50%; font-size:22px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-}
+/* PHOTO VIEWER */
+.pv{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;display:none;align-items:center;justify-content:center;}
+.pv.show{display:flex;}
+.pv img{max-width:96vw;max-height:90dvh;border-radius:8px;object-fit:contain;}
+.pv-x{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<div class="header">
-  <div class="header-left">
+<div class="hdr">
+  <div class="hdr-l">
     <a href="index.html" class="back-btn">&#8249;</a>
     <h1>🏗️ Infrastructure</h1>
   </div>
-  <button class="fs-btn" id="fsBtn" onclick="enterFullscreenLandscape()" title="Plein écran">⛶</button>
-  <button class="edit-btn" id="editBtn" onclick="toggleEdit()">
-    <span id="eIcon">✏️</span>
-    <span id="eLabel">Éditer</span>
-  </button>
+  <div class="hdr-r">
+    <button class="fs-btn" id="fsBtn" onclick="enterFS()">⛶</button>
+    <button class="edit-btn" id="editBtn" onclick="toggleEdit()">
+      <span id="eIco">✏️</span><span id="eLbl">Éditer</span>
+    </button>
+  </div>
 </div>
 
 <!-- CATEGORIES -->
-<div class="cats-bar" id="catsBar">
-  <div class="cat-pill active" data-cat="electric" style="background:#f97316">
+<div class="cats" id="catsBar">
+  <div class="pill sel" data-cat="electric" style="background:#f97316">
     <span style="width:8px;height:8px;border-radius:50%;background:#f97316;flex-shrink:0"></span>
-    ⚡ Compteur élec. <span class="cnt" id="cnt-electric">0</span>
-    <span class="pill-edit-btns">
-      <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('electric')">✏️</button>
-      <button class="pill-btn d" onclick="event.stopPropagation();delCat('electric')">✕</button>
+    ⚡ Compteur élec. <span class="n" id="n-electric">0</span>
+    <span class="pill-ebts">
+      <button class="pebt e" onclick="event.stopPropagation();openCatMod('electric')">✏️</button>
+      <button class="pebt d" onclick="event.stopPropagation();delCat('electric')">✕</button>
     </span>
   </div>
-  <div class="cat-pill" data-cat="fire">
+  <div class="pill" data-cat="fire">
     <span style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
-    🧯 Extincteur <span class="cnt" id="cnt-fire">0</span>
-    <span class="pill-edit-btns">
-      <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('fire')">✏️</button>
-      <button class="pill-btn d" onclick="event.stopPropagation();delCat('fire')">✕</button>
+    🧯 Extincteur <span class="n" id="n-fire">0</span>
+    <span class="pill-ebts">
+      <button class="pebt e" onclick="event.stopPropagation();openCatMod('fire')">✏️</button>
+      <button class="pebt d" onclick="event.stopPropagation();delCat('fire')">✕</button>
     </span>
   </div>
-  <div class="cat-pill" data-cat="water">
+  <div class="pill" data-cat="water">
     <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></span>
-    💧 Borne eau <span class="cnt" id="cnt-water">0</span>
-    <span class="pill-edit-btns">
-      <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('water')">✏️</button>
-      <button class="pill-btn d" onclick="event.stopPropagation();delCat('water')">✕</button>
+    💧 Borne eau <span class="n" id="n-water">0</span>
+    <span class="pill-ebts">
+      <button class="pebt e" onclick="event.stopPropagation();openCatMod('water')">✏️</button>
+      <button class="pebt d" onclick="event.stopPropagation();delCat('water')">✕</button>
     </span>
   </div>
-  <div class="cat-pill" data-cat="trash">
+  <div class="pill" data-cat="trash">
     <span style="width:8px;height:8px;border-radius:50%;background:#16a34a;flex-shrink:0"></span>
-    ♻️ Poubelle <span class="cnt" id="cnt-trash">0</span>
-    <span class="pill-edit-btns">
-      <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('trash')">✏️</button>
-      <button class="pill-btn d" onclick="event.stopPropagation();delCat('trash')">✕</button>
+    ♻️ Poubelle <span class="n" id="n-trash">0</span>
+    <span class="pill-ebts">
+      <button class="pebt e" onclick="event.stopPropagation();openCatMod('trash')">✏️</button>
+      <button class="pebt d" onclick="event.stopPropagation();delCat('trash')">✕</button>
     </span>
   </div>
-  <div class="cat-pill" data-cat="other">
+  <div class="pill" data-cat="other">
     <span style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></span>
-    📍 Autre <span class="cnt" id="cnt-other">0</span>
-    <span class="pill-edit-btns">
-      <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('other')">✏️</button>
-      <button class="pill-btn d" onclick="event.stopPropagation();delCat('other')">✕</button>
+    📍 Autre <span class="n" id="n-other">0</span>
+    <span class="pill-ebts">
+      <button class="pebt e" onclick="event.stopPropagation();openCatMod('other')">✏️</button>
+      <button class="pebt d" onclick="event.stopPropagation();delCat('other')">✕</button>
     </span>
   </div>
-  <div class="cat-add-pill" onclick="openCatModal(null)">＋ Catégorie</div>
+  <div class="add-pill" onclick="openCatMod(null)">＋ Catégorie</div>
 </div>
 
 <!-- MAP -->
 <div class="map-area" id="mapArea">
-  <label class="upload-fab" for="mapFileInput">🗺️ Importer un plan</label>
-  <input type="file" id="mapFileInput" accept="image/*" onchange="loadMapImg(event)">
+  <label class="upload-fab" for="mapFile">🗺️ Importer un plan</label>
+  <input type="file" id="mapFile" accept="image/*" onchange="loadMap(event)">
 
-  <div id="mapWrapper" style="position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;">
-  <div id="mapImg">
-    <div class="map-empty" id="mapEmpty">
-      <span class="big">🗺️</span>
-      <p>Importez un plan du camping</p>
-      <small>Bouton "Importer un plan" ci-dessus</small>
+  <div id="mapWrap">
+    <div id="mapEl">
+      <div class="map-empty" id="mapEmpty">
+        <span class="ico">🗺️</span>
+        <p>Importez un plan du camping</p>
+        <small>Bouton ci-dessus</small>
+      </div>
     </div>
   </div>
-  </div><!-- end mapWrapper -->
 
-  <div class="edit-hint">✏️ Appuyez sur la carte pour ajouter un point</div>
+  <div class="edit-hint">✏️ Touchez la carte pour ajouter un point</div>
 
-  <!-- Zoom controls -->
   <div class="zoom-btns">
     <div class="zbtn" onclick="doZoom(1.3)">+</div>
     <div class="zbtn" onclick="doZoom(0.77)">−</div>
-    <div class="zbtn" style="font-size:13px;font-weight:700;" onclick="resetZoom()">↺</div>
+    <div class="zbtn" style="font-size:13px" onclick="resetZoom()">↺</div>
   </div>
 </div>
 
-<!-- SHEET: Ajouter un point -->
-<div class="overlay" id="addOverlay">
+<!-- SHEET: Nouveau point -->
+<div class="ov" id="addOv">
   <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head" id="addHead">
-      <h3 id="addTitle">Nouveau point</h3>
-      <button class="sheet-x" onclick="closeAdd()">×</button>
-    </div>
-    <div class="sheet-body">
-      <label class="flabel">Nom *</label>
-      <input class="finput" id="ptName" type="text" placeholder="Ex : Compteur A3" maxlength="40" autocomplete="off">
-      <label class="flabel">Description (optionnel)</label>
-      <textarea class="ftextarea" id="ptDesc" placeholder="Notes, état, remarques..."></textarea>
+    <div class="sh-handle"></div>
+    <div class="sh-head" id="addHead"><h3 id="addTitle">Nouveau point</h3><button class="sh-x" onclick="closeAdd()">×</button></div>
+    <div class="sh-body">
+      <label class="flbl">Nom *</label>
+      <input class="fin" id="ptName" type="text" placeholder="Ex : Compteur A3" maxlength="40" autocomplete="off">
+      <label class="flbl">Description (optionnel)</label>
+      <textarea class="fta" id="ptDesc" placeholder="Notes, état..."></textarea>
       <div class="row2">
-        <button class="gbtn cancel" onclick="closeAdd()">Annuler</button>
-        <button class="gbtn ok" id="addConfirmBtn">✓ Ajouter</button>
+        <button class="btn cancel" onclick="closeAdd()">Annuler</button>
+        <button class="btn ok" onclick="confirmAdd()">✓ Ajouter</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- SHEET: Détail point -->
-<div class="overlay" id="detailOverlay">
+<div class="ov" id="detOv">
   <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head" id="detailHead">
-      <h3 id="detailTitle">Point</h3>
-      <button class="sheet-x" onclick="closeDetail()">×</button>
-    </div>
-    <div class="sheet-body" id="detailBody"></div>
+    <div class="sh-handle"></div>
+    <div class="sh-head" id="detHead"><h3 id="detTitle">Point</h3><button class="sh-x" onclick="closeDet()">×</button></div>
+    <div class="sh-body" id="detBody"></div>
   </div>
 </div>
 
 <!-- SHEET: Catégorie -->
-<div class="overlay" id="catOverlay">
+<div class="ov" id="catOv">
   <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head" style="background:#166534">
-      <h3 id="catTitle">Catégorie</h3>
-      <button class="sheet-x" onclick="closeCatModal()">×</button>
-    </div>
-    <div class="sheet-body">
-      <label class="flabel">Nom</label>
-      <input class="finput" id="catName" type="text" placeholder="Ex: Prises électriques" maxlength="30" autocomplete="off">
-      <label class="flabel">Icône</label>
-      <div class="emoji-grid" id="emojiGrid"></div>
-      <label class="flabel">Couleur</label>
-      <div class="color-row" id="colorRow"></div>
+    <div class="sh-handle"></div>
+    <div class="sh-head" style="background:#166534"><h3 id="catTitle">Catégorie</h3><button class="sh-x" onclick="closeCatMod()">×</button></div>
+    <div class="sh-body">
+      <label class="flbl">Nom</label>
+      <input class="fin" id="catName" type="text" placeholder="Ex: Prises" maxlength="30" autocomplete="off">
+      <label class="flbl">Icône</label>
+      <div class="emojis" id="emojiGrid"></div>
+      <label class="flbl">Couleur</label>
+      <div class="colors" id="colorGrid"></div>
       <div class="row2">
-        <button class="gbtn cancel" onclick="closeCatModal()">Annuler</button>
-        <button class="gbtn ok" onclick="doSaveCat()">✓ Enregistrer</button>
+        <button class="btn cancel" onclick="closeCatMod()">Annuler</button>
+        <button class="btn ok" onclick="saveCatMod()">✓ Enregistrer</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Photo viewer -->
-<div class="photo-viewer" id="photoViewer" onclick="closeViewer()">
-  <button class="pv-close">×</button>
+<div class="pv" id="pv" onclick="closePV()">
+  <button class="pv-x">×</button>
   <img id="pvImg" src="" alt="">
 </div>
 
@@ -454,8 +257,8 @@ firebase.initializeApp({
 });
 const db = firebase.database();
 
-// ── CONSTANTS ──────────────────────────────────
-const DEFAULT_CATS = [
+// ═══ CONSTANTES ═══════════════════════════════════════
+const DEF_CATS = [
   {id:'electric',emoji:'⚡',color:'#f97316',label:'Compteur élec.'},
   {id:'fire',    emoji:'🧯',color:'#ef4444',label:'Extincteur'},
   {id:'water',   emoji:'💧',color:'#3b82f6',label:'Borne eau'},
@@ -465,120 +268,86 @@ const DEFAULT_CATS = [
 const EMOJIS = ['⚡','🧯','💧','♻️','📍','🔌','🚿','🔥','⚠️','🚗','🅿️','🏕️','🛖','🔧','🗑️','💡','🔒','📦','🪣','🌿'];
 const COLORS = ['#f97316','#ef4444','#3b82f6','#16a34a','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#64748b','#0ea5e9'];
 
-// ── STATE ──────────────────────────────────────
+// ═══ ÉTAT ══════════════════════════════════════════════
 let CATS = {}, catOrder = [];
-let editing = false, activeCat = 'electric';
-let points = [], currentPt = null;
-let pendRx, pendRy;
+let editing = false;
+let activeCat = 'electric';
+let points = [];
+let currentPt = null;
+let pendRx = 0, pendRy = 0;
 let editCatId = null, selEmoji = EMOJIS[0], selColor = COLORS[0];
 
-const mapArea = document.getElementById('mapArea');
-const mapImgEl  = document.getElementById('mapImg');
-const mapWrapper = document.getElementById('mapWrapper');
+// Pan/zoom
+let sc = 1, panX = 0, panY = 0;
+let natW = 0, natH = 0;
+let mapLoaded = false;
+// drag state
+let drag = false, dSx, dSy, dPx, dPy, pinchDist = 0;
 
-// Pan/zoom state
-let sc=1, panX=0, panY=0;
-let isDragging=false, dragStartX, dragStartY, dragStartPanX, dragStartPanY;
-let lastPinchDist=0, isTouching=false;
+const mapArea  = document.getElementById('mapArea');
+const mapWrap  = document.getElementById('mapWrap');
+const mapEl    = document.getElementById('mapEl');
 
-// ── INIT ───────────────────────────────────────
+// ═══ INIT ══════════════════════════════════════════════
 window.addEventListener('load', () => {
-  // Wire static pills
-  document.querySelectorAll('#catsBar .cat-pill[data-cat]').forEach(p => {
-    p.addEventListener('click', () => selectCat(p.dataset.cat));
+  document.querySelectorAll('#catsBar .pill[data-cat]').forEach(p => {
+    p.addEventListener('click', () => selCat(p.dataset.cat));
   });
-
-  // Add confirm button listener
-  document.getElementById('addConfirmBtn').addEventListener('click', doAddPoint);
-
-  // Force fullscreen + landscape immediately
-  enterFullscreenLandscape();
-
-  fixBodyHeight();
-  checkOrientation();
+  setBodyH();
+  enterFS();
+  lockLandscape();
   loadFirebase();
 });
 
-function enterFullscreenLandscape() {
-  // 1. Request fullscreen
-  const el = document.documentElement;
-  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
-  if(req) {
-    req.call(el).then(() => {
-      // 2. Lock orientation to landscape once fullscreen is granted
-      lockLandscape();
-    }).catch(() => {
-      // Fullscreen denied (iOS), still try orientation lock
-      lockLandscape();
-    });
-  } else {
-    lockLandscape();
-  }
-}
-
-function lockLandscape() {
-  try {
-    if(screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    } else if(window.screen.lockOrientation) {
-      window.screen.lockOrientation('landscape');
-    } else if(window.screen.mozLockOrientation) {
-      window.screen.mozLockOrientation('landscape');
-    }
-  } catch(e) {}
-}
-
-// Unlock when leaving the page
-window.addEventListener('beforeunload', () => {
-  try {
-    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-  } catch(e) {}
-});
-
-function fixBodyHeight() {
-  // Force true visible height (avoids browser chrome eating space)
-  document.body.style.height = window.innerHeight + 'px';
-}
-
-window.addEventListener('resize', () => {
-  fixBodyHeight();
-  checkOrientation();
-  resizeMap();
-});
+window.addEventListener('resize', () => { setBodyH(); resizeMap(); });
 window.addEventListener('orientationchange', () => {
   setTimeout(() => {
-    fixBodyHeight();
-    checkOrientation();
-    resizeMap();
-    // Si on passe en paysage, activer plein écran automatiquement
-    const isLandscape = window.innerWidth > window.innerHeight;
-    if(isLandscape) {
-      const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-      if(!inFs) enterFullscreenLandscape();
+    setBodyH(); resizeMap();
+    if(window.innerWidth > window.innerHeight) {
+      if(!(document.fullscreenElement||document.webkitFullscreenElement)) enterFS();
     }
   }, 400);
 });
-
-// Aussi détecter via screen.orientation si dispo
 if(screen.orientation) {
   screen.orientation.addEventListener('change', () => {
     setTimeout(() => {
-      fixBodyHeight(); checkOrientation(); resizeMap();
-      const isLandscape = screen.orientation.type.startsWith('landscape');
-      if(isLandscape) {
-        const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-        if(!inFs) enterFullscreenLandscape();
+      setBodyH(); resizeMap();
+      if(screen.orientation.type.startsWith('landscape')) {
+        if(!(document.fullscreenElement||document.webkitFullscreenElement)) enterFS();
       }
     }, 300);
   });
 }
 
-function checkOrientation() {
-  const isPortrait = window.innerHeight > window.innerWidth;
-  document.body.classList.toggle('portrait', isPortrait);
-}
+function setBodyH() { document.body.style.height = window.innerHeight + 'px'; }
 
-// ── FIREBASE ───────────────────────────────────
+function enterFS() {
+  const el = document.documentElement;
+  const fn = el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen;
+  if(fn) fn.call(el).then(()=>lockLandscape()).catch(()=>lockLandscape());
+  else lockLandscape();
+}
+function lockLandscape() {
+  try {
+    if(screen.orientation?.lock) screen.orientation.lock('landscape').catch(()=>{});
+    else if(screen.lockOrientation) screen.lockOrientation('landscape');
+  } catch(e){}
+}
+document.addEventListener('fullscreenchange', () => {
+  const inFS = !!(document.fullscreenElement||document.webkitFullscreenElement);
+  document.getElementById('fsBtn').textContent = inFS ? '⊠' : '⛶';
+  setTimeout(()=>{ setBodyH(); resizeMap(); }, 200);
+});
+document.addEventListener('webkitfullscreenchange', () => {
+  const inFS = !!(document.fullscreenElement||document.webkitFullscreenElement);
+  document.getElementById('fsBtn').textContent = inFS ? '⊠' : '⛶';
+  setTimeout(()=>{ setBodyH(); resizeMap(); }, 200);
+});
+window.addEventListener('beforeunload', () => {
+  try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
+});
+
+// ═══ FIREBASE ══════════════════════════════════════════
 function loadFirebase() {
   db.ref('infrastructure/cats').once('value', snap => {
     const v = snap.val();
@@ -586,7 +355,7 @@ function loadFirebase() {
     if(v && Array.isArray(v) && v.length) {
       v.forEach(c => { CATS[c.id]=c; catOrder.push(c.id); });
     } else {
-      DEFAULT_CATS.forEach(c => { CATS[c.id]=c; catOrder.push(c.id); });
+      DEF_CATS.forEach(c => { CATS[c.id]=c; catOrder.push(c.id); });
       saveCats();
     }
     renderCats();
@@ -594,473 +363,369 @@ function loadFirebase() {
 
   db.ref('infrastructure/points').on('value', snap => {
     points = [];
-    mapImgEl.querySelectorAll('.point').forEach(e => e.remove());
+    mapEl.querySelectorAll('.pin-wrap').forEach(e=>e.remove());
     const v = snap.val();
-    if(v) Object.values(v).forEach(p => { points.push(p); renderPin(p); });
+    if(v) Object.values(v).forEach(p => { points.push(p); drawPin(p); });
     updateCounts();
   });
 
-  db.ref('infrastructure/mapImageUrl').once('value', snap => {
-    if(snap.val()) applyMapUrl(snap.val());
+  db.ref('infrastructure/mapUrl').once('value', snap => {
+    if(snap.val()) applyMap(snap.val());
   });
 }
 
 function saveCats() { db.ref('infrastructure/cats').set(catOrder.map(id=>CATS[id])); }
-function savePoint(p) { db.ref('infrastructure/points/'+p.id).set(p); }
-function deletePoint(id) { db.ref('infrastructure/points/'+id).remove(); }
+function fbSavePt(p) { db.ref('infrastructure/points/'+p.id).set(p); }
+function fbDelPt(id) { db.ref('infrastructure/points/'+id).remove(); }
 
-// ── MAP IMAGE ──────────────────────────────────
-let naturalW = 0, naturalH = 0;
-
-function loadMapImg(e) {
+// ═══ MAP ═══════════════════════════════════════════════
+function loadMap(e) {
   const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    db.ref('infrastructure/mapImageUrl').set(ev.target.result);
-    applyMapUrl(ev.target.result);
-  };
-  reader.readAsDataURL(file);
+  const r = new FileReader();
+  r.onload = ev => { db.ref('infrastructure/mapUrl').set(ev.target.result); applyMap(ev.target.result); };
+  r.readAsDataURL(file);
 }
 
-function applyMapUrl(url) {
+function applyMap(url) {
+  document.getElementById('mapEmpty')?.remove();
+  mapEl.querySelectorAll('img.bg').forEach(e=>e.remove());
   const tmp = new Image();
   tmp.onload = () => {
-    naturalW = tmp.naturalWidth;
-    naturalH = tmp.naturalHeight;
-
-    // Remove empty state
-    document.getElementById('mapEmpty')?.remove();
-    mapImgEl.querySelectorAll('img.mapbg').forEach(e=>e.remove());
-
+    natW = tmp.naturalWidth; natH = tmp.naturalHeight;
     const img = document.createElement('img');
-    img.className = 'mapbg';
-    img.src = url;
-    img.draggable = false;
-    mapImgEl.insertBefore(img, mapImgEl.firstChild);
-
-    document.body.classList.add('map-loaded');
+    img.className = 'bg'; img.src = url; img.draggable = false;
+    mapEl.insertBefore(img, mapEl.firstChild);
+    mapLoaded = true;
     resizeMap();
-
-    // Wire tap on map
-    // tap handled by touchend/mouseup
   };
   tmp.src = url;
 }
 
 function resizeMap() {
-  if(!naturalW || !naturalH) return;
-  const areaW = mapArea.clientWidth;
-  const areaH = mapArea.clientHeight;
-  const ratio = naturalW / naturalH;
-  const areaRatio = areaW / areaH;
-
+  if(!natW||!natH) return;
+  const aw = mapArea.clientWidth, ah = mapArea.clientHeight;
   let w, h;
-  if(ratio > areaRatio) { w = areaW; h = areaW / ratio; }
-  else { h = areaH; w = areaH * ratio; }
-
-  mapImgEl.style.width  = Math.round(w) + 'px';
-  mapImgEl.style.height = Math.round(h) + 'px';
-
-  // Center the wrapper
-  panX = (areaW - w) / 2;
-  panY = (areaH - h) / 2;
-  sc = 1;
-  applyMapTransform();
+  if(natW/natH > aw/ah) { w=aw; h=aw*natH/natW; }
+  else { h=ah; w=ah*natW/natH; }
+  w=Math.round(w); h=Math.round(h);
+  mapEl.style.width=w+'px'; mapEl.style.height=h+'px';
+  sc=1; panX=(aw-w)/2; panY=(ah-h)/2;
+  applyT();
 }
 
-function applyMapTransform() {
-  mapWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${sc})`;
+function applyT() { mapWrap.style.transform=`translate(${panX}px,${panY}px) scale(${sc})`; }
+function doZoom(f) {
+  const aw=mapArea.clientWidth, ah=mapArea.clientHeight;
+  const nsc=Math.min(6,Math.max(0.2,sc*f));
+  panX=aw/2-(aw/2-panX)*(nsc/sc);
+  panY=ah/2-(ah/2-panY)*(nsc/sc);
+  sc=nsc; applyT();
 }
+function resetZoom() { resizeMap(); }
 
-function doZoom(factor) {
-  const areaW = mapArea.clientWidth;
-  const areaH = mapArea.clientHeight;
-  const newSc = Math.min(6, Math.max(0.3, sc * factor));
-  // Zoom toward center of map area
-  const cx = areaW / 2;
-  const cy = areaH / 2;
-  panX = cx - (cx - panX) * (newSc / sc);
-  panY = cy - (cy - panY) * (newSc / sc);
-  sc = newSc;
-  applyMapTransform();
-}
-
-function resetZoom() {
-  resizeMap(); // resets to fit screen
-}
-
-// ── TOUCH PAN/ZOOM ──────────────────────────────
+// ═══ PAN/ZOOM TOUCH ════════════════════════════════════
 mapArea.addEventListener('touchstart', e => {
-  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.sheet')) return;
-  const touches = Array.from(e.touches);
-  if(touches.length === 1) {
-    isDragging = true; isTouching = true;
-    dragStartX = touches[0].clientX;
-    dragStartY = touches[0].clientY;
-    dragStartPanX = panX;
-    dragStartPanY = panY;
+  // Don't intercept touches on buttons or sheets
+  if(e.target.closest('.zbtn,.upload-fab,.pebt,.add-pill,.ov')) return;
+  const tc = Array.from(e.touches);
+  if(tc.length===1) {
+    drag=true; dSx=tc[0].clientX; dSy=tc[0].clientY; dPx=panX; dPy=panY;
+  } else if(tc.length===2) {
+    drag=false;
+    pinchDist=Math.hypot(tc[0].clientX-tc[1].clientX,tc[0].clientY-tc[1].clientY);
   }
-  if(touches.length === 2) {
-    isDragging = false;
-    lastPinchDist = Math.hypot(
-      touches[0].clientX - touches[1].clientX,
-      touches[0].clientY - touches[1].clientY
-    );
-  }
-}, {passive: true});
+},{passive:true});
 
 mapArea.addEventListener('touchmove', e => {
-  if(e.target.closest('.sheet')) return;
+  if(e.target.closest('.ov')) return;
   e.preventDefault();
-  const touches = Array.from(e.touches);
-  if(touches.length === 1 && isDragging) {
-    panX = dragStartPanX + (touches[0].clientX - dragStartX);
-    panY = dragStartPanY + (touches[0].clientY - dragStartY);
-    applyMapTransform();
+  const tc = Array.from(e.touches);
+  if(tc.length===1 && drag) {
+    panX=dPx+(tc[0].clientX-dSx); panY=dPy+(tc[0].clientY-dSy); applyT();
+  } else if(tc.length===2) {
+    const d=Math.hypot(tc[0].clientX-tc[1].clientX,tc[0].clientY-tc[1].clientY);
+    const mx=(tc[0].clientX+tc[1].clientX)/2, my=(tc[0].clientY+tc[1].clientY)/2;
+    const nsc=Math.min(6,Math.max(0.2,sc*(d/pinchDist)));
+    panX=mx-(mx-panX)*(nsc/sc); panY=my-(my-panY)*(nsc/sc);
+    sc=nsc; pinchDist=d; applyT();
   }
-  if(touches.length === 2) {
-    const dist = Math.hypot(
-      touches[0].clientX - touches[1].clientX,
-      touches[0].clientY - touches[1].clientY
-    );
-    const midX = (touches[0].clientX + touches[1].clientX) / 2;
-    const midY = (touches[0].clientY + touches[1].clientY) / 2;
-    const newSc = Math.min(6, Math.max(0.3, sc * (dist / lastPinchDist)));
-    panX = midX - (midX - panX) * (newSc / sc);
-    panY = midY - (midY - panY) * (newSc / sc);
-    sc = newSc;
-    lastPinchDist = dist;
-    applyMapTransform();
-  }
-}, {passive: false});
+},{passive:false});
 
 mapArea.addEventListener('touchend', e => {
-  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill')) { isDragging=false; isTouching=false; return; }
+  if(e.target.closest('.zbtn,.upload-fab,.pebt,.add-pill,.ov')) { drag=false; return; }
   const t = e.changedTouches[0];
-  const wasTap = isDragging
-    && Math.abs(t.clientX - dragStartX) < 10
-    && Math.abs(t.clientY - dragStartY) < 10;
-  isDragging = false; isTouching = false;
-  if(editing && wasTap) {
-    const rect = mapImgEl.getBoundingClientRect();
-    const rx = (t.clientX - rect.left) / rect.width;
-    const ry = (t.clientY - rect.top)  / rect.height;
-    if(rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) openAdd(rx, ry);
-  }
-}, {passive: true});
+  const moved = !drag || Math.abs(t.clientX-dSx)>10 || Math.abs(t.clientY-dSy)>10;
+  drag=false;
+  if(moved) return;
 
-// Mouse pan (desktop)
+  // Check if tapped on a pin (check target AND parents up to mapEl)
+  const pinEl = e.target.closest('.pin-wrap');
+  if(pinEl) {
+    const ptId = parseInt(pinEl.id.replace('pin-',''));
+    const pt = points.find(p=>p.id===ptId);
+    if(pt) { openDet(pt); return; }
+  }
+
+  // Only add point if in edit mode and tapped on map (not a pin)
+  if(editing) {
+    const rect = mapEl.getBoundingClientRect();
+    const rx=(t.clientX-rect.left)/rect.width, ry=(t.clientY-rect.top)/rect.height;
+    if(rx>=0&&ry>=0&&rx<=1&&ry<=1) { pendRx=rx; pendRy=ry; openAdd(); }
+  }
+},{passive:true});
+
+// Mouse (desktop)
 mapArea.addEventListener('mousedown', e => {
-  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.point')) return;
-  isDragging = true;
-  dragStartX = e.clientX; dragStartY = e.clientY;
-  dragStartPanX = panX; dragStartPanY = panY;
-  mapArea.style.cursor = 'grabbing';
+  if(e.target.closest('.zbtn,.upload-fab,.pebt,.add-pill,.ov,.pin-wrap')) return;
+  drag=true; dSx=e.clientX; dSy=e.clientY; dPx=panX; dPy=panY;
+  mapArea.style.cursor='grabbing';
 });
 window.addEventListener('mousemove', e => {
-  if(!isDragging) return;
-  panX = dragStartPanX + (e.clientX - dragStartX);
-  panY = dragStartPanY + (e.clientY - dragStartY);
-  applyMapTransform();
+  if(!drag) return;
+  panX=dPx+(e.clientX-dSx); panY=dPy+(e.clientY-dSy); applyT();
 });
 window.addEventListener('mouseup', e => {
-  if(!isDragging) return;
-  const wasTap = Math.abs(e.clientX - dragStartX) < 5 && Math.abs(e.clientY - dragStartY) < 5;
-  isDragging = false;
-  mapArea.style.cursor = '';
-  if(editing && wasTap && !e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill')) {
-    const rect = mapImgEl.getBoundingClientRect();
-    const rx = (e.clientX - rect.left) / rect.width;
-    const ry = (e.clientY - rect.top)  / rect.height;
-    if(rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) openAdd(rx, ry);
+  if(!drag) return;
+  const tap = Math.abs(e.clientX-dSx)<5 && Math.abs(e.clientY-dSy)<5;
+  drag=false; mapArea.style.cursor='';
+  if(!tap) return;
+  if(editing && !e.target.closest('.zbtn,.upload-fab,.pebt,.add-pill,.pin-wrap')) {
+    const rect=mapEl.getBoundingClientRect();
+    const rx=(e.clientX-rect.left)/rect.width, ry=(e.clientY-rect.top)/rect.height;
+    if(rx>=0&&ry>=0&&rx<=1&&ry<=1) { pendRx=rx; pendRy=ry; openAdd(); }
   }
 });
 mapArea.addEventListener('wheel', e => {
   e.preventDefault();
-  const factor = e.deltaY < 0 ? 1.12 : 0.9;
-  const newSc = Math.min(6, Math.max(0.3, sc * factor));
-  panX = e.clientX - (e.clientX - panX) * (newSc / sc);
-  panY = e.clientY - (e.clientY - panY) * (newSc / sc);
-  sc = newSc;
-  applyMapTransform();
-}, {passive: false});
+  const nsc=Math.min(6,Math.max(0.2,sc*(e.deltaY<0?1.12:0.9)));
+  panX=e.clientX-(e.clientX-panX)*(nsc/sc);
+  panY=e.clientY-(e.clientY-panY)*(nsc/sc);
+  sc=nsc; applyT();
+},{passive:false});
 
-
-
-// ── EDIT MODE ──────────────────────────────────
+// ═══ EDIT MODE ═════════════════════════════════════════
 function toggleEdit() {
-  editing = !editing;
-  document.body.classList.toggle('editing', editing);
-  document.getElementById('editBtn').classList.toggle('active', editing);
-  document.getElementById('eIcon').textContent = editing ? '✓' : '✏️';
-  document.getElementById('eLabel').textContent = editing ? 'Valider' : 'Éditer';
+  editing=!editing;
+  document.body.classList.toggle('editing',editing);
+  document.getElementById('editBtn').classList.toggle('on',editing);
+  document.getElementById('eIco').textContent=editing?'✓':'✏️';
+  document.getElementById('eLbl').textContent=editing?'Valider':'Éditer';
 }
 
-// ── CATEGORIES ─────────────────────────────────
+// ═══ CATÉGORIES ════════════════════════════════════════
 function renderCats() {
-  const bar = document.getElementById('catsBar');
-  bar.querySelectorAll('.cat-pill').forEach(e => e.remove());
-  const addBtn = bar.querySelector('.cat-add-pill');
-  catOrder.forEach(id => {
-    const c = CATS[id]; if(!c) return;
-    const d = document.createElement('div');
-    d.className = 'cat-pill' + (id===activeCat ? ' active' : '');
-    d.dataset.cat = id;
-    if(id===activeCat) d.style.background = c.color;
-    d.innerHTML = `
-      <span style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0"></span>
-      ${c.emoji} ${c.label}
-      <span class="cnt" id="cnt-${id}">0</span>
-      <span class="pill-edit-btns">
-        <button class="pill-btn e" onclick="event.stopPropagation();openCatModal('${id}')">✏️</button>
-        <button class="pill-btn d" onclick="event.stopPropagation();delCat('${id}')">✕</button>
+  const bar=document.getElementById('catsBar');
+  bar.querySelectorAll('.pill').forEach(e=>e.remove());
+  const addBtn=bar.querySelector('.add-pill');
+  catOrder.forEach(id=>{
+    const c=CATS[id]; if(!c) return;
+    const d=document.createElement('div');
+    d.className='pill'+(id===activeCat?' sel':'');
+    d.dataset.cat=id;
+    if(id===activeCat) d.style.background=c.color;
+    d.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0"></span>
+      ${c.emoji} ${c.label} <span class="n" id="n-${id}">0</span>
+      <span class="pill-ebts">
+        <button class="pebt e" onclick="event.stopPropagation();openCatMod('${id}')">✏️</button>
+        <button class="pebt d" onclick="event.stopPropagation();delCat('${id}')">✕</button>
       </span>`;
-    d.addEventListener('click', () => selectCat(id));
-    bar.insertBefore(d, addBtn);
+    d.addEventListener('click',()=>selCat(id));
+    bar.insertBefore(d,addBtn);
   });
   updateCounts();
 }
 
-function selectCat(id) {
-  activeCat = id;
-  document.querySelectorAll('#catsBar .cat-pill').forEach(p => {
-    const on = p.dataset.cat === id;
-    p.classList.toggle('active', on);
-    p.style.background = on ? (CATS[id]?.color || '') : '';
+function selCat(id) {
+  activeCat=id;
+  document.querySelectorAll('#catsBar .pill').forEach(p=>{
+    const on=p.dataset.cat===id;
+    p.classList.toggle('sel',on);
+    p.style.background=on?(CATS[id]?.color||''):'';
   });
 }
 
 function delCat(id) {
-  if(points.some(p => p.cat===id)) { alert('Supprimez d\'abord les points de cette catégorie.'); return; }
+  if(points.some(p=>p.cat===id)){alert('Supprimez d\'abord les points de cette catégorie.');return;}
   if(!confirm(`Supprimer "${CATS[id]?.label}" ?`)) return;
-  delete CATS[id];
-  catOrder = catOrder.filter(x => x!==id);
-  if(activeCat===id) activeCat = catOrder[0]||'';
+  delete CATS[id]; catOrder=catOrder.filter(x=>x!==id);
+  if(activeCat===id) activeCat=catOrder[0]||'';
   saveCats(); renderCats();
-  mapImgEl.querySelectorAll('.point').forEach(e=>e.remove());
-  points.forEach(renderPin);
+  mapEl.querySelectorAll('.pin-wrap').forEach(e=>e.remove()); points.forEach(drawPin);
 }
 
 function updateCounts() {
-  catOrder.forEach(id => {
-    const el = document.getElementById('cnt-'+id);
-    if(el) el.textContent = points.filter(p => p.cat===id).length;
+  catOrder.forEach(id=>{
+    const el=document.getElementById('n-'+id);
+    if(el) el.textContent=points.filter(p=>p.cat===id).length;
   });
 }
 
-// ── ADD POINT SHEET ────────────────────────────
+// ═══ AJOUTER UN POINT ══════════════════════════════════
 function openAdd() {
-  if(!activeCat || !CATS[activeCat]) {
-    activeCat = catOrder[0];
-    if(!activeCat) { alert('Créez d\'abord une catégorie.'); return; }
-  }
-  const c = CATS[activeCat];
-  document.getElementById('addHead').style.background = c.color;
-  document.getElementById('addTitle').textContent = `${c.emoji} Nouveau ${c.label}`;
-  document.getElementById('ptName').value = '';
-  document.getElementById('ptDesc').value = '';
-  document.getElementById('addOverlay').classList.add('show');
-  // Focus after animation
-  setTimeout(() => document.getElementById('ptName').focus(), 350);
+  if(!activeCat||!CATS[activeCat]) { activeCat=catOrder[0]; if(!activeCat) return; }
+  const c=CATS[activeCat];
+  document.getElementById('addHead').style.background=c.color;
+  document.getElementById('addTitle').textContent=`${c.emoji} Nouveau ${c.label}`;
+  document.getElementById('ptName').value='';
+  document.getElementById('ptDesc').value='';
+  document.getElementById('addOv').classList.add('show');
+  setTimeout(()=>document.getElementById('ptName').focus(),350);
 }
-
-function closeAdd() {
-  document.getElementById('addOverlay').classList.remove('show');
-}
-
-function doAddPoint() {
-  const nameEl = document.getElementById('ptName');
-  const name = nameEl.value.trim();
-  if(!name) {
-    nameEl.style.borderColor = '#ef4444';
-    nameEl.focus();
-    return;
-  }
-  nameEl.style.borderColor = '';
-  const desc = document.getElementById('ptDesc').value.trim();
-  const p = {
-    id: Date.now(),
-    cat: activeCat,
-    rx: pendRx,
-    ry: pendRy,
-    label: name,
-    desc: desc,
-    photos: []
-  };
-  savePoint(p);
+function closeAdd() { document.getElementById('addOv').classList.remove('show'); }
+function confirmAdd() {
+  const name=document.getElementById('ptName').value.trim();
+  if(!name){ document.getElementById('ptName').style.borderColor='#ef4444'; document.getElementById('ptName').focus(); return; }
+  document.getElementById('ptName').style.borderColor='';
+  const p={id:Date.now(),cat:activeCat,rx:pendRx,ry:pendRy,label:name,desc:document.getElementById('ptDesc').value.trim(),photos:[]};
+  fbSavePt(p);
   closeAdd();
 }
 
-// ── POINT DETAIL ───────────────────────────────
-function openDetail(p) {
-  currentPt = p;
-  const c = CATS[p.cat] || {emoji:'📍', color:'#64748b', label:'Autre'};
-  document.getElementById('detailHead').style.background = c.color;
-  document.getElementById('detailTitle').textContent = `${c.emoji} ${p.label}`;
+// ═══ DÉTAIL POINT ══════════════════════════════════════
+function openDet(p) {
+  currentPt=p;
+  const c=CATS[p.cat]||{emoji:'📍',color:'#64748b',label:'Autre'};
+  document.getElementById('detHead').style.background=c.color;
+  document.getElementById('detTitle').textContent=`${c.emoji} ${p.label}`;
 
-  let h = `<div class="pp-badge" style="background:${c.color}">${c.emoji} ${c.label}</div>`;
-  h += `<div class="pp-title">${p.label}</div>`;
-  h += p.desc ? `<div class="pp-desc">${p.desc}</div>` : `<div class="pp-nodesc">Aucune description</div>`;
+  let h=`<div class="dp-badge" style="background:${c.color}">${c.emoji} ${c.label}</div>`;
+  h+=`<div class="dp-title">${p.label}</div>`;
+  h+=p.desc?`<div class="dp-desc">${p.desc}</div>`:`<div class="dp-nodesc">Aucune description</div>`;
 
   // Photos
-  if(p.photos && p.photos.length) {
-    h += `<div class="pp-photos">`;
-    p.photos.forEach((url,i) => {
-      h += `<div class="pp-photo">
-        <img src="${url}" onclick="openViewer('${url}')">
-        ${editing ? `<button class="del-ph-btn" onclick="doDelPhoto(${i})">×</button>` : ''}
+  const photos=p.photos||[];
+  if(photos.length){
+    h+=`<div class="photos-grid" id="photosGrid">`;
+    photos.forEach((url,i)=>{
+      h+=`<div class="photo-item">
+        <img data-url="${url}" data-action="viewphoto">
+        ${editing?`<button class="photo-del" data-action="delphoto" data-idx="${i}">×</button>`:''}
       </div>`;
     });
-    h += `</div>`;
+    h+=`</div>`;
   }
 
+  if(editing){
+    h+=`<label class="add-ph-lbl" id="addPhLbl">📷 Ajouter des photos</label>
+        <input type="file" id="phInput" accept="image/*" multiple style="display:none">`;
+    h+=`<hr class="divider">`;
+    h+=`<label class="flbl">✏️ Modifier le nom</label>
+        <input class="fin" id="editName" type="text" value="${p.label.replace(/"/g,'&quot;')}" maxlength="40" autocomplete="off">
+        <label class="flbl">Description</label>
+        <textarea class="fta" id="editDesc">${p.desc||''}</textarea>`;
+    h+=`<button class="btn ok" style="width:100%;margin-bottom:10px" id="saveDetBtn">💾 Sauvegarder</button>`;
+    h+=`<button class="btn red" id="delPtBtn">🗑️ Supprimer ce point</button>`;
+  }
+
+  const body = document.getElementById('detBody');
+  body.innerHTML = h;
+
+  // Wire buttons AFTER innerHTML set (no inline onclick = no CSP issues)
   if(editing) {
-    // Add photo
-    h += `<label style="display:flex;align-items:center;justify-content:center;gap:8px;
-      padding:11px;border:2px dashed #16a34a;border-radius:10px;
-      font-size:14px;font-weight:600;color:#16a34a;cursor:pointer;margin-bottom:14px;"
-      for="ppPhotoInput">📷 Ajouter des photos</label>
-      <input type="file" id="ppPhotoInput" accept="image/*" multiple onchange="doAddPhoto(event)" style="display:none">`;
-
-    // Edit name + desc
-    h += `<hr style="border:none;border-top:2px solid #dcfce7;margin:4px 0 14px">`;
-    h += `<label class="flabel">✏️ Modifier le nom</label>
-      <input class="finput" id="ppName" type="text" value="${p.label.replace(/"/g,'&quot;')}" maxlength="40" autocomplete="off">
-      <label class="flabel">Description</label>
-      <textarea class="ftextarea" id="ppDesc" placeholder="Description...">${p.desc||''}</textarea>
-      <button class="gbtn ok" style="width:100%;margin-bottom:10px" onclick="doSaveDetail()">💾 Sauvegarder les modifications</button>`;
-
-    // Delete — always visible in edit mode, styled clearly
-    h += `<button onclick="doDelPoint()" style="
-      width:100%;padding:13px;border-radius:10px;border:2px solid #ef4444;
-      background:#fef2f2;color:#ef4444;font-family:inherit;
-      font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;">
-      🗑️ Supprimer ce point</button>`;
-  } else {
-    // Read mode: just show add photo option
-    if(p.photos && p.photos.length) {
-      h += `<p style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:8px">Appuyez sur une photo pour l'agrandir</p>`;
-    }
+    document.getElementById('saveDetBtn').addEventListener('click', saveDet);
+    document.getElementById('delPtBtn').addEventListener('click', delPt);
+    document.getElementById('addPhLbl').addEventListener('click', ()=>document.getElementById('phInput').click());
+    document.getElementById('phInput').addEventListener('change', addPhotos);
   }
 
-  document.getElementById('detailBody').innerHTML = h;
-  document.getElementById('detailOverlay').classList.add('show');
+  // Wire photo actions
+  body.querySelectorAll('[data-action="viewphoto"]').forEach(img=>{
+    img.src = img.dataset.url;
+    img.addEventListener('click', ()=>openPV(img.dataset.url));
+  });
+  body.querySelectorAll('[data-action="delphoto"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>delPhoto(parseInt(btn.dataset.idx)));
+  });
+
+  document.getElementById('detOv').classList.add('show');
 }
 
-function closeDetail() {
-  document.getElementById('detailOverlay').classList.remove('show');
-  currentPt = null;
+function closeDet() { document.getElementById('detOv').classList.remove('show'); currentPt=null; }
+
+function saveDet() {
+  const p=points.find(x=>x.id===currentPt.id); if(!p) return;
+  const name=document.getElementById('editName')?.value.trim(); if(!name) return;
+  p.label=name; p.desc=document.getElementById('editDesc')?.value.trim()||'';
+  fbSavePt(p); closeDet();
 }
 
-function doSaveDetail() {
-  const p = points.find(x => x.id===currentPt.id); if(!p) return;
-  const name = document.getElementById('ppName').value.trim(); if(!name) return;
-  p.label = name;
-  p.desc  = document.getElementById('ppDesc').value.trim();
-  savePoint(p);
-  closeDetail();
+function delPt() {
+  if(!confirm('Supprimer ce point définitivement ?')) return;
+  fbDelPt(currentPt.id); closeDet();
 }
 
-function doDelPoint() {
-  if(confirm('Supprimer ce point ?')) { deletePoint(currentPt.id); closeDetail(); }
-}
-
-function doAddPhoto(e) {
-  const p = points.find(x => x.id===currentPt.id); if(!p) return;
-  if(!p.photos) p.photos = [];
-  const files = Array.from(e.target.files); let left = files.length;
-  files.forEach(f => {
-    const r = new FileReader();
-    r.onload = ev => {
-      p.photos.push(ev.target.result);
-      if(--left === 0) { savePoint(p); openDetail(p); }
-    };
+function addPhotos(e) {
+  const p=points.find(x=>x.id===currentPt.id); if(!p) return;
+  if(!p.photos) p.photos=[];
+  const files=Array.from(e.target.files); let left=files.length;
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{ p.photos.push(ev.target.result); if(--left===0){ fbSavePt(p); openDet(p); } };
     r.readAsDataURL(f);
   });
 }
 
-function doDelPhoto(i) {
-  const p = points.find(x => x.id===currentPt.id); if(!p) return;
-  if(confirm('Supprimer cette photo ?')) { p.photos.splice(i,1); savePoint(p); openDetail(p); }
+function delPhoto(i) {
+  const p=points.find(x=>x.id===currentPt.id); if(!p) return;
+  if(!confirm('Supprimer cette photo ?')) return;
+  p.photos.splice(i,1); fbSavePt(p); openDet(p);
 }
 
-// ── RENDER PIN ─────────────────────────────────
-function renderPin(p) {
-  const c = CATS[p.cat] || {emoji:'📍', color:'#64748b'};
-  const el = document.createElement('div');
-  el.className = 'point';
-  el.id = 'pt-' + p.id;
-  el.style.left = (p.rx * 100) + '%';
-  el.style.top  = (p.ry * 100) + '%';
-  el.innerHTML = `<div class="pin" style="background:${c.color}"><span class="pin-inner">${c.emoji}</span></div>`;
-  el.addEventListener('click', ev => { ev.stopPropagation(); openDetail(p); });
-  mapImgEl.appendChild(el);
+// ═══ DESSINER UN PIN ═══════════════════════════════════
+function drawPin(p) {
+  const c=CATS[p.cat]||{emoji:'📍',color:'#64748b'};
+  const el=document.createElement('div');
+  el.className='pin-wrap'; el.id='pin-'+p.id;
+  el.style.left=(p.rx*100)+'%'; el.style.top=(p.ry*100)+'%';
+  el.innerHTML=`<div class="pin" style="background:${c.color}"><span class="pin-i">${c.emoji}</span></div>`;
+
+  // Reliable tap on pin - both touch and click
+  let pinTouchMoved = false;
+  el.addEventListener('touchstart', ev=>{ pinTouchMoved=false; },{passive:true});
+  el.addEventListener('touchmove',  ev=>{ pinTouchMoved=true;  },{passive:true});
+  el.addEventListener('touchend',   ev=>{
+    ev.stopPropagation();
+    if(!pinTouchMoved) openDet(p);
+    drag=false; // cancel map drag
+  },{passive:true});
+  el.addEventListener('click', ev=>{ ev.stopPropagation(); openDet(p); });
+  mapEl.appendChild(el);
 }
 
-// ── CAT MODAL ──────────────────────────────────
-function openCatModal(id) {
-  editCatId = id;
-  const c = id ? CATS[id] : null;
-  document.getElementById('catTitle').textContent = id ? '✏️ Modifier' : '➕ Nouvelle catégorie';
-  document.getElementById('catName').value = c ? c.label : '';
-  selEmoji = c ? c.emoji : EMOJIS[0];
-  selColor = c ? c.color : COLORS[0];
-  document.getElementById('emojiGrid').innerHTML = EMOJIS.map(em =>
+// ═══ CAT MODAL ═════════════════════════════════════════
+function openCatMod(id) {
+  editCatId=id;
+  const c=id?CATS[id]:null;
+  document.getElementById('catTitle').textContent=id?'✏️ Modifier':'➕ Nouvelle catégorie';
+  document.getElementById('catName').value=c?c.label:'';
+  selEmoji=c?c.emoji:EMOJIS[0]; selColor=c?c.color:COLORS[0];
+  document.getElementById('emojiGrid').innerHTML=EMOJIS.map(em=>
     `<div class="emj${em===selEmoji?' sel':''}" onclick="pickEmoji('${em}')">${em}</div>`).join('');
-  document.getElementById('colorRow').innerHTML = COLORS.map(co =>
+  document.getElementById('colorGrid').innerHTML=COLORS.map(co=>
     `<div class="clr${co===selColor?' sel':''}" style="background:${co}" onclick="pickColor('${co}')"></div>`).join('');
-  document.getElementById('catOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('catName').focus(), 350);
+  document.getElementById('catOv').classList.add('show');
+  setTimeout(()=>document.getElementById('catName').focus(),350);
 }
-function closeCatModal() { document.getElementById('catOverlay').classList.remove('show'); }
+function closeCatMod() { document.getElementById('catOv').classList.remove('show'); }
 function pickEmoji(e) { selEmoji=e; document.querySelectorAll('.emj').forEach(el=>el.classList.toggle('sel',el.textContent===e)); }
 function pickColor(c) { selColor=c; document.querySelectorAll('.clr').forEach(el=>el.classList.toggle('sel',el.style.background===c||el.style.backgroundColor===c)); }
-function doSaveCat() {
-  const name = document.getElementById('catName').value.trim();
-  if(!name) { alert('Nom requis'); return; }
-  if(editCatId) {
-    CATS[editCatId].label=name; CATS[editCatId].emoji=selEmoji; CATS[editCatId].color=selColor;
-  } else {
-    const nid='cat_'+Date.now();
-    CATS[nid]={id:nid,label:name,emoji:selEmoji,color:selColor};
-    catOrder.push(nid); activeCat=nid;
-  }
+function saveCatMod() {
+  const name=document.getElementById('catName').value.trim(); if(!name){alert('Nom requis');return;}
+  if(editCatId){ CATS[editCatId].label=name; CATS[editCatId].emoji=selEmoji; CATS[editCatId].color=selColor; }
+  else { const nid='cat_'+Date.now(); CATS[nid]={id:nid,label:name,emoji:selEmoji,color:selColor}; catOrder.push(nid); activeCat=nid; }
   saveCats(); renderCats();
-  mapImgEl.querySelectorAll('.point').forEach(e=>e.remove());
-  points.forEach(renderPin);
-  closeCatModal();
+  mapEl.querySelectorAll('.pin-wrap').forEach(e=>e.remove()); points.forEach(drawPin);
+  closeCatMod();
 }
 
-// ── PHOTO VIEWER ───────────────────────────────
-function openViewer(url) { document.getElementById('pvImg').src=url; document.getElementById('photoViewer').classList.add('show'); }
-function closeViewer() { document.getElementById('photoViewer').classList.remove('show'); }
+// ═══ PHOTO VIEWER ══════════════════════════════════════
+function openPV(url) { document.getElementById('pvImg').src=url; document.getElementById('pv').classList.add('show'); }
+function closePV() { document.getElementById('pv').classList.remove('show'); }
 
-// ── FULLSCREEN ────────────────────────────────────
-document.addEventListener('fullscreenchange', updateFsBtn);
-document.addEventListener('webkitfullscreenchange', updateFsBtn);
-function updateFsBtn() {
-  const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  const btn = document.getElementById('fsBtn');
-  btn.textContent = inFs ? '⊠' : '⛶';
-  btn.onclick = inFs ? exitFs : enterFullscreenLandscape;
-  setTimeout(() => { fixBodyHeight(); resizeMap(); }, 300);
-}
-function exitFs() {
-  try {
-    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-  } catch(e) {}
-  const ex = document.exitFullscreen || document.webkitExitFullscreen;
-  if(ex) ex.call(document).catch(()=>{});
-}
-
-// ── CLOSE OVERLAYS ON BG CLICK ─────────────────
-document.getElementById('detailOverlay').addEventListener('click', e => {
-  if(e.target===document.getElementById('detailOverlay')) closeDetail();
-});
-document.getElementById('catOverlay').addEventListener('click', e => {
-  if(e.target===document.getElementById('catOverlay')) closeCatModal();
-});
-// addOverlay: no bg click to close (avoid accidental close on mobile)
+// ═══ FERMER SHEETS SUR FOND ════════════════════════════
+document.getElementById('detOv').addEventListener('click',e=>{ if(e.target===document.getElementById('detOv')) closeDet(); });
+document.getElementById('catOv').addEventListener('click',e=>{ if(e.target===document.getElementById('catOv')) closeCatMod(); });
+// addOv : pas de fermeture sur fond pour éviter fermeture accidentelle
 </script>
 </body>
 </html>
