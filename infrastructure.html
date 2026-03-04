@@ -7,35 +7,43 @@
 <title>Infrastructure - Le Bellevue</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
 body {
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#f0fdf4; height:100dvh; overflow:hidden;
-  display:flex; flex-direction:column;
+  background:#f0fdf4;
+  height:100dvh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  color:#111;
 }
 
-/* HEADER */
+/* ── HEADER ── */
 .header {
-  background:#16a34a; color:white; padding:12px 16px;
+  background:#16a34a; color:white;
+  padding:12px 16px;
   display:flex; align-items:center; justify-content:space-between;
-  flex-shrink:0; box-shadow:0 2px 8px rgba(22,101,52,0.3);
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(22,101,52,0.3);
 }
 .header-left { display:flex; align-items:center; gap:10px; }
 .back-btn {
   background:rgba(255,255,255,0.2); border:none; color:white;
   width:34px; height:34px; border-radius:8px;
   display:flex; align-items:center; justify-content:center;
-  text-decoration:none; font-size:20px; font-weight:bold;
+  text-decoration:none; font-size:22px; font-weight:bold;
 }
 .header h1 { font-size:18px; font-weight:700; }
 .edit-btn {
-  background:white; color:#16a34a; border:none; padding:8px 14px;
-  border-radius:8px; font-family:inherit; font-size:14px; font-weight:700;
+  background:white; color:#16a34a; border:none;
+  padding:8px 14px; border-radius:8px;
+  font-family:inherit; font-size:14px; font-weight:700;
   cursor:pointer; display:flex; align-items:center; gap:5px;
   box-shadow:0 2px 6px rgba(0,0,0,0.15);
 }
 .edit-btn.active { background:#facc15; color:#166534; }
 
-/* CATEGORIES */
+/* ── CATEGORIES ── */
 .cats-bar {
   background:white; border-bottom:2px solid #dcfce7;
   display:flex; align-items:center; gap:8px; padding:8px 12px;
@@ -43,228 +51,258 @@ body {
 }
 .cats-bar::-webkit-scrollbar { display:none; }
 .cat-pill {
-  display:flex; align-items:center; gap:5px; padding:7px 12px;
-  border-radius:20px; border:2px solid #d1d5db; background:white;
-  cursor:pointer; white-space:nowrap; font-size:13px; font-weight:600;
-  color:#374151; flex-shrink:0; transition:all .15s;
+  display:flex; align-items:center; gap:5px;
+  padding:7px 12px; border-radius:20px;
+  border:2px solid #d1d5db; background:white;
+  cursor:pointer; white-space:nowrap;
+  font-size:13px; font-weight:600; color:#374151; flex-shrink:0;
 }
 .cat-pill.active { color:white; border-color:transparent; }
 .cat-pill .cnt {
-  background:rgba(0,0,0,0.12); border-radius:10px; padding:1px 6px; font-size:11px;
+  background:rgba(0,0,0,0.12); border-radius:10px;
+  padding:1px 6px; font-size:11px;
 }
-/* edit mode buttons on pills */
 .pill-edit-btns { display:none; align-items:center; gap:2px; margin-left:3px; }
 body.editing .pill-edit-btns { display:flex; }
 .pill-btn {
   width:20px; height:20px; border-radius:50%; border:none;
-  display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; cursor:pointer;
 }
 .pill-btn.e { background:rgba(0,0,0,0.1); color:#374151; }
 .cat-pill.active .pill-btn.e { background:rgba(255,255,255,0.3); color:white; }
 .pill-btn.d { background:rgba(239,68,68,0.15); color:#ef4444; }
-.cat-pill.active .pill-btn.d { background:rgba(255,255,255,0.25); color:white; }
-
 .cat-add-pill {
-  display:none; align-items:center; gap:5px; padding:7px 12px;
-  border-radius:20px; border:2px dashed #16a34a; background:white;
-  cursor:pointer; white-space:nowrap; font-size:13px; font-weight:700;
-  color:#16a34a; flex-shrink:0;
+  display:none; align-items:center; gap:5px;
+  padding:7px 12px; border-radius:20px;
+  border:2px dashed #16a34a; background:white;
+  cursor:pointer; white-space:nowrap;
+  font-size:13px; font-weight:700; color:#16a34a; flex-shrink:0;
 }
 body.editing .cat-add-pill { display:flex; }
 
-/* MAP AREA */
+/* ── MAP AREA ── */
 .map-area {
-  flex:1; overflow:hidden; position:relative;
-  background:#e5f5e9; touch-action:none;
+  flex:1; position:relative; overflow:hidden;
+  background:#e8f5e9;
+  display:flex; align-items:center; justify-content:center;
 }
-.map-canvas {
-  position:absolute; top:0; left:0; transform-origin:0 0;
-  cursor:grab; will-change:transform;
-}
-.map-canvas:active { cursor:grabbing; }
-body.editing .map-canvas { cursor:crosshair; }
 
-/* The map image itself */
+/* The map image fills the area, no crop */
 #mapImg {
-  display:block;
-  /* size set dynamically by JS */
   position:relative;
+  display:block;
+  /* sized by JS */
 }
 #mapImg img {
-  display:block; width:100%; height:100%; border-radius:0;
+  display:block;
+  width:100%; height:100%;
+  user-select:none; -webkit-user-select:none;
+  pointer-events:none;
 }
-.map-empty {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:12px; color:#16a34a; background:white; border:3px dashed #86efac; border-radius:12px;
-}
-.map-empty .big { font-size:56px; }
-.map-empty p { font-size:15px; font-weight:700; }
-.map-empty small { font-size:12px; color:#86efac; }
 
-/* UPLOAD BTN */
+/* Portrait hint */
+.rotate-hint {
+  display:none;
+  position:absolute; inset:0;
+  background:rgba(22,101,52,0.92);
+  align-items:center; justify-content:center;
+  flex-direction:column; gap:16px; color:white; z-index:50;
+  text-align:center; padding:30px;
+}
+.rotate-hint .icon { font-size:56px; }
+.rotate-hint p { font-size:17px; font-weight:700; }
+.rotate-hint small { font-size:13px; opacity:.8; }
+
+/* Show hint in portrait when map is loaded */
+body.map-loaded.portrait .rotate-hint { display:flex; }
+body.editing.map-loaded.portrait .rotate-hint { display:none; } /* allow editing in portrait too */
+
+/* Empty state */
+.map-empty {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:14px; color:#16a34a;
+  width:100%; height:100%;
+}
+.map-empty .big { font-size:60px; }
+.map-empty p { font-size:16px; font-weight:700; }
+.map-empty small { font-size:13px; color:#86efac; }
+
+/* Upload btn */
 .upload-fab {
   position:absolute; top:12px; left:50%; transform:translateX(-50%);
   background:white; border:2px solid #16a34a; border-radius:20px;
   padding:8px 16px; font-size:13px; font-weight:600; color:#166534;
   cursor:pointer; display:flex; align-items:center; gap:6px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:30; white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:20; white-space:nowrap;
 }
 #mapFileInput { display:none; }
 
-/* EDIT HINT */
+/* Edit hint banner */
 .edit-hint {
-  position:absolute; bottom:72px; left:50%; transform:translateX(-50%);
-  background:#facc15; color:#166534; padding:9px 18px; border-radius:30px;
-  font-size:13px; font-weight:700; z-index:30; display:none; white-space:nowrap;
+  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+  background:#facc15; color:#166534;
+  padding:9px 18px; border-radius:30px;
+  font-size:13px; font-weight:700; z-index:20;
+  display:none; white-space:nowrap;
   box-shadow:0 4px 12px rgba(0,0,0,0.15); pointer-events:none;
 }
 body.editing .edit-hint { display:block; }
 
-/* ZOOM */
-.zoom-btns {
-  position:absolute; right:12px; bottom:16px;
-  display:flex; flex-direction:column; gap:6px; z-index:30;
-}
-.zbtn {
-  width:42px; height:42px; background:white; border:2px solid #d1fae5;
-  border-radius:10px; color:#166534; font-size:24px; font-weight:700;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.12); user-select:none;
-}
-
-/* POINTS */
+/* ── POINTS ── */
 .point {
-  position:absolute; transform:translate(-50%,-100%);
-  cursor:pointer; z-index:20; transition:opacity .2s;
+  position:absolute;
+  transform:translate(-50%, -100%);
+  cursor:pointer; z-index:10;
 }
-.point.dim { opacity:0.2; }
 .pin {
-  width:34px; height:34px; border-radius:50% 50% 50% 0; transform:rotate(-45deg);
-  border:2px solid rgba(255,255,255,.6); box-shadow:0 3px 10px rgba(0,0,0,0.35);
-  display:flex; align-items:center; justify-content:center; font-size:15px;
+  width:32px; height:32px;
+  border-radius:50% 50% 50% 0; transform:rotate(-45deg);
+  border:2px solid rgba(255,255,255,.6);
+  box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px;
 }
 .pin-inner { transform:rotate(45deg); }
-.point:active .pin { transform:rotate(-45deg) scale(1.2); }
+.point:active .pin { transform:rotate(-45deg) scale(1.15); }
 
-/* =================== MODALS =================== */
+/* ── BOTTOM SHEETS ── */
 .overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
   display:flex; align-items:flex-end; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .2s;
-  /* Stay above virtual keyboard */
-  bottom:env(keyboard-inset-height, 0);
+  opacity:0; pointer-events:none; transition:opacity .25s;
 }
 .overlay.show { opacity:1; pointer-events:all; }
+
 .sheet {
-  background:#f0fdf4; border-radius:20px 20px 0 0; width:100%; max-width:520px;
-  transform:translateY(100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
-  max-height:88dvh; overflow-y:auto;
-  box-shadow:0 -4px 24px rgba(0,0,0,0.18);
+  background:#f0fdf4;
+  border-radius:20px 20px 0 0;
+  width:100%; max-width:520px;
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:85dvh; overflow-y:auto;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.2);
   color:#111;
 }
-/* Ensure text visible in all inputs */
-.sheet input, .sheet textarea {
-  color:#111 !important;
-  -webkit-text-fill-color:#111 !important;
-  opacity:1 !important;
-}
 .overlay.show .sheet { transform:translateY(0); }
+
 .sheet-handle {
-  width:40px; height:4px; background:#d1d5db; border-radius:4px;
-  margin:10px auto 0; flex-shrink:0;
+  width:40px; height:4px; background:#d1d5db;
+  border-radius:4px; margin:10px auto 0;
 }
 .sheet-head {
-  padding:14px 20px 14px; display:flex; align-items:center;
-  justify-content:space-between; position:sticky; top:0;
-  background:#16a34a; color:white; z-index:5;
+  padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:#16a34a; color:white;
+  position:sticky; top:0; z-index:5;
 }
 .sheet-head h3 { font-size:17px; font-weight:700; }
 .sheet-x {
   background:rgba(255,255,255,0.2); border:none; color:white;
-  width:30px; height:30px; border-radius:50%; font-size:18px;
-  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  width:30px; height:30px; border-radius:50%;
+  font-size:18px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0;
 }
-.sheet-body { padding:18px 20px 32px; }
+.sheet-body { padding:18px 20px 40px; }
+
 .flabel { font-size:13px; font-weight:600; color:#166534; margin-bottom:7px; display:block; }
 .finput {
-  width:100%; padding:12px; border:2px solid #d1d5db; border-radius:10px;
-  font-size:16px; font-family:inherit; outline:none; background:white; margin-bottom:14px;
+  width:100%; padding:12px;
+  border:2px solid #d1d5db; border-radius:10px;
+  font-size:16px; font-family:inherit;
+  outline:none; background:white;
+  color:#111 !important; -webkit-text-fill-color:#111 !important;
+  margin-bottom:14px;
 }
 .finput:focus { border-color:#16a34a; }
 .ftextarea {
-  width:100%; padding:12px; border:2px solid #d1d5db; border-radius:10px;
-  font-size:15px; font-family:inherit; outline:none; background:white;
+  width:100%; padding:12px;
+  border:2px solid #d1d5db; border-radius:10px;
+  font-size:15px; font-family:inherit;
+  outline:none; background:white;
+  color:#111 !important; -webkit-text-fill-color:#111 !important;
   resize:none; min-height:80px; margin-bottom:14px;
 }
 .ftextarea:focus { border-color:#16a34a; }
+
 .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .gbtn {
-  padding:13px; border-radius:10px; border:none; font-family:inherit;
-  font-size:15px; font-weight:700; cursor:pointer;
+  padding:13px; border-radius:10px; border:none;
+  font-family:inherit; font-size:15px; font-weight:700; cursor:pointer;
 }
 .gbtn.cancel { background:#e5e7eb; color:#374151; }
 .gbtn.ok { background:#16a34a; color:white; }
-.gbtn.danger { background:#fef2f2; color:#ef4444; }
 
-/* POINT DETAIL */
-.pp-cat-badge {
-  display:inline-flex; align-items:center; gap:5px; padding:4px 12px;
-  border-radius:20px; color:white; font-size:12px; font-weight:700; margin-bottom:12px;
+/* Point detail */
+.pp-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; border-radius:20px; color:white;
+  font-size:12px; font-weight:700; margin-bottom:12px;
 }
-.pp-title { font-size:21px; font-weight:700; color:#166534; margin-bottom:8px; }
+.pp-title { font-size:20px; font-weight:700; color:#166534; margin-bottom:8px; }
 .pp-desc { font-size:14px; color:#374151; margin-bottom:16px; white-space:pre-wrap; line-height:1.5; }
 .pp-nodesc { font-size:13px; color:#9ca3af; margin-bottom:16px; font-style:italic; }
-.pp-photos { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+
+.pp-photos { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
 .pp-photo { aspect-ratio:1; border-radius:10px; overflow:hidden; position:relative; background:#f3f4f6; }
 .pp-photo img { width:100%; height:100%; object-fit:cover; cursor:pointer; display:block; }
-.pp-photo .del-photo {
-  position:absolute; top:4px; right:4px; background:#ef4444; color:white;
-  border:none; border-radius:50%; width:24px; height:24px; font-size:15px;
+.pp-photo .del-ph {
+  position:absolute; top:4px; right:4px;
+  background:#ef4444; color:white; border:none;
+  border-radius:50%; width:24px; height:24px; font-size:15px;
   display:none; align-items:center; justify-content:center; cursor:pointer;
 }
-body.editing .del-photo { display:flex; }
-.add-photo-btn {
+body.editing .del-ph { display:flex; }
+
+.add-photo-lbl {
   display:none; align-items:center; justify-content:center; gap:8px;
   padding:11px; border:2px dashed #16a34a; border-radius:10px;
   font-size:14px; font-weight:600; color:#16a34a; cursor:pointer; margin-bottom:14px;
 }
-body.editing .add-photo-btn { display:flex; }
+body.editing .add-photo-lbl { display:flex; }
 #ppPhotoInput { display:none; }
-.edit-desc-section { display:none; }
-body.editing .edit-desc-section { display:block; }
-.del-point-btn {
-  width:100%; padding:13px; border-radius:10px; border:none;
-  background:#fef2f2; color:#ef4444; font-family:inherit; font-size:15px;
-  font-weight:700; cursor:pointer; margin-top:6px; display:none;
-}
-body.editing .del-point-btn { display:block; }
 
-/* CAT MODAL */
+.edit-section { display:none; }
+body.editing .edit-section { display:block; }
+
+.del-pt-btn {
+  width:100%; padding:13px; border-radius:10px; border:none;
+  background:#fef2f2; color:#ef4444;
+  font-family:inherit; font-size:15px; font-weight:700;
+  cursor:pointer; margin-top:6px; display:none;
+}
+body.editing .del-pt-btn { display:block; }
+
+/* Cat modal */
 .emoji-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
 .emj {
-  width:42px; height:42px; border-radius:10px; border:2px solid #e5e7eb;
-  background:white; font-size:20px; cursor:pointer;
+  width:42px; height:42px; border-radius:10px;
+  border:2px solid #e5e7eb; background:white;
+  font-size:20px; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
 }
 .emj.sel { border-color:#16a34a; background:#dcfce7; }
 .color-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
 .clr {
   width:34px; height:34px; border-radius:50%;
-  border:3px solid transparent; cursor:pointer; transition:transform .15s;
+  border:3px solid transparent; cursor:pointer;
 }
-.clr.sel { border-color:#166534; transform:scale(1.2); }
+.clr.sel { border-color:#166534; outline:2px solid #166534; outline-offset:2px; }
 
-/* PHOTO VIEWER */
+/* Photo viewer */
 .photo-viewer {
-  position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:2000;
-  display:none; align-items:center; justify-content:center;
+  position:fixed; inset:0; background:rgba(0,0,0,0.93);
+  z-index:2000; display:none; align-items:center; justify-content:center;
 }
 .photo-viewer.show { display:flex; }
-.photo-viewer img { max-width:96vw; max-height:88dvh; border-radius:8px; object-fit:contain; }
+.photo-viewer img { max-width:96vw; max-height:90dvh; border-radius:8px; object-fit:contain; }
 .pv-close {
-  position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.15);
-  border:none; color:white; width:40px; height:40px; border-radius:50%;
-  font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  position:absolute; top:16px; right:16px;
+  background:rgba(255,255,255,0.15); border:none; color:white;
+  width:42px; height:42px; border-radius:50%; font-size:22px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
 }
 </style>
 </head>
@@ -332,25 +370,25 @@ body.editing .del-point-btn { display:block; }
   <label class="upload-fab" for="mapFileInput">🗺️ Importer un plan</label>
   <input type="file" id="mapFileInput" accept="image/*" onchange="loadMapImg(event)">
 
-  <div class="map-canvas" id="mapCanvas">
-    <div id="mapImg" style="width:100vw;height:100vw">
-      <div class="map-empty" style="width:100%;height:100%;display:flex">
-        <span class="big">🗺️</span>
-        <p>Importez un plan</p>
-        <small>Bouton en haut ↑</small>
-      </div>
+  <div id="mapImg">
+    <div class="map-empty" id="mapEmpty">
+      <span class="big">🗺️</span>
+      <p>Importez un plan du camping</p>
+      <small>Bouton "Importer un plan" ci-dessus</small>
     </div>
   </div>
 
-  <div class="edit-hint">✏️ Touchez la carte pour placer un point</div>
-
-  <div class="zoom-btns">
-    <div class="zbtn" onclick="doZoom(1.25)">+</div>
-    <div class="zbtn" onclick="doZoom(0.8)">−</div>
+  <!-- Portrait overlay -->
+  <div class="rotate-hint">
+    <span class="icon">🔄</span>
+    <p>Tournez votre téléphone</p>
+    <small>La carte s'affiche en mode paysage</small>
   </div>
+
+  <div class="edit-hint">✏️ Appuyez sur la carte pour ajouter un point</div>
 </div>
 
-<!-- SHEET: Nouveau point -->
+<!-- SHEET: Ajouter un point -->
 <div class="overlay" id="addOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -360,12 +398,12 @@ body.editing .del-point-btn { display:block; }
     </div>
     <div class="sheet-body">
       <label class="flabel">Nom *</label>
-      <input class="finput" id="ptName" placeholder="Ex : Compteur A3" maxlength="40">
+      <input class="finput" id="ptName" type="text" placeholder="Ex : Compteur A3" maxlength="40" autocomplete="off">
       <label class="flabel">Description (optionnel)</label>
-      <textarea class="ftextarea" id="ptDesc" placeholder="Notes, état, informations utiles..."></textarea>
+      <textarea class="ftextarea" id="ptDesc" placeholder="Notes, état, remarques..."></textarea>
       <div class="row2">
         <button class="gbtn cancel" onclick="closeAdd()">Annuler</button>
-        <button class="gbtn ok" onclick="doAddPoint()">✓ Ajouter</button>
+        <button class="gbtn ok" id="addConfirmBtn">✓ Ajouter</button>
       </div>
     </div>
   </div>
@@ -376,7 +414,7 @@ body.editing .del-point-btn { display:block; }
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-head" id="detailHead">
-      <h3 id="detailHeadTitle">Point</h3>
+      <h3 id="detailTitle">Point</h3>
       <button class="sheet-x" onclick="closeDetail()">×</button>
     </div>
     <div class="sheet-body" id="detailBody"></div>
@@ -393,7 +431,7 @@ body.editing .del-point-btn { display:block; }
     </div>
     <div class="sheet-body">
       <label class="flabel">Nom</label>
-      <input class="finput" id="catName" placeholder="Ex: Prises électriques" maxlength="30">
+      <input class="finput" id="catName" type="text" placeholder="Ex: Prises électriques" maxlength="30" autocomplete="off">
       <label class="flabel">Icône</label>
       <div class="emoji-grid" id="emojiGrid"></div>
       <label class="flabel">Couleur</label>
@@ -407,8 +445,8 @@ body.editing .del-point-btn { display:block; }
 </div>
 
 <!-- Photo viewer -->
-<div class="photo-viewer" id="photoViewer">
-  <button class="pv-close" onclick="closeViewer()">×</button>
+<div class="photo-viewer" id="photoViewer" onclick="closeViewer()">
+  <button class="pv-close">×</button>
   <img id="pvImg" src="" alt="">
 </div>
 
@@ -426,7 +464,7 @@ firebase.initializeApp({
 });
 const db = firebase.database();
 
-// ─── CONSTANTS ────────────────────────────────
+// ── CONSTANTS ──────────────────────────────────
 const DEFAULT_CATS = [
   {id:'electric',emoji:'⚡',color:'#f97316',label:'Compteur élec.'},
   {id:'fire',    emoji:'🧯',color:'#ef4444',label:'Extincteur'},
@@ -437,31 +475,44 @@ const DEFAULT_CATS = [
 const EMOJIS = ['⚡','🧯','💧','♻️','📍','🔌','🚿','🔥','⚠️','🚗','🅿️','🏕️','🛖','🔧','🗑️','💡','🔒','📦','🪣','🌿'];
 const COLORS = ['#f97316','#ef4444','#3b82f6','#16a34a','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#64748b','#0ea5e9'];
 
-// ─── STATE ─────────────────────────────────────
+// ── STATE ──────────────────────────────────────
 let CATS = {}, catOrder = [];
-let editing = false, activeCat = 'electric', filterCat = 'all';
+let editing = false, activeCat = 'electric';
 let points = [], currentPt = null;
-let pendX, pendY;
-// pan/zoom
-let sc=1, tx=0, ty=0;
-let drag=false, sx,sy,stx,sty, ldist=0, tchs=[];
-// natural image size
-let mapW=0, mapH=0;
+let pendRx, pendRy;
+let editCatId = null, selEmoji = EMOJIS[0], selColor = COLORS[0];
 
-const mapArea   = document.getElementById('mapArea');
-const mapCanvas = document.getElementById('mapCanvas');
-const mapImg    = document.getElementById('mapImg');
+const mapArea = document.getElementById('mapArea');
+const mapImgEl = document.getElementById('mapImg');
 
-// ─── INIT ──────────────────────────────────────
+// ── INIT ───────────────────────────────────────
 window.addEventListener('load', () => {
+  // Wire static pills
   document.querySelectorAll('#catsBar .cat-pill[data-cat]').forEach(p => {
     p.addEventListener('click', () => selectCat(p.dataset.cat));
   });
-  activeCat = 'electric';
+
+  // Add confirm button listener (not onclick to avoid issues)
+  document.getElementById('addConfirmBtn').addEventListener('click', doAddPoint);
+
+  checkOrientation();
   loadFirebase();
 });
 
-// ─── FIREBASE ──────────────────────────────────
+window.addEventListener('resize', () => {
+  checkOrientation();
+  resizeMap();
+});
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => { checkOrientation(); resizeMap(); }, 300);
+});
+
+function checkOrientation() {
+  const isPortrait = window.innerHeight > window.innerWidth;
+  document.body.classList.toggle('portrait', isPortrait);
+}
+
+// ── FIREBASE ───────────────────────────────────
 function loadFirebase() {
   db.ref('infrastructure/cats').once('value', snap => {
     const v = snap.val();
@@ -474,128 +525,100 @@ function loadFirebase() {
     }
     renderCats();
   });
+
   db.ref('infrastructure/points').on('value', snap => {
     points = [];
-    mapImg.querySelectorAll('.point').forEach(e=>e.remove());
+    mapImgEl.querySelectorAll('.point').forEach(e => e.remove());
     const v = snap.val();
     if(v) Object.values(v).forEach(p => { points.push(p); renderPin(p); });
     updateCounts();
   });
+
   db.ref('infrastructure/mapImageUrl').once('value', snap => {
     if(snap.val()) applyMapUrl(snap.val());
   });
 }
+
 function saveCats() { db.ref('infrastructure/cats').set(catOrder.map(id=>CATS[id])); }
 function savePoint(p) { db.ref('infrastructure/points/'+p.id).set(p); }
 function deletePoint(id) { db.ref('infrastructure/points/'+id).remove(); }
 
-// ─── MAP IMAGE ─────────────────────────────────
+// ── MAP IMAGE ──────────────────────────────────
+let naturalW = 0, naturalH = 0;
+
 function loadMapImg(e) {
   const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    const url = ev.target.result;
-    db.ref('infrastructure/mapImageUrl').set(url);
-    applyMapUrl(url);
+    db.ref('infrastructure/mapImageUrl').set(ev.target.result);
+    applyMapUrl(ev.target.result);
   };
   reader.readAsDataURL(file);
 }
 
 function applyMapUrl(url) {
-  // Remove placeholder
-  mapImg.querySelector('.map-empty')?.remove();
-  mapImg.querySelectorAll('img.mapbg').forEach(e=>e.remove());
-
-  // Load image to get natural dimensions
   const tmp = new Image();
   tmp.onload = () => {
-    mapW = tmp.naturalWidth;
-    mapH = tmp.naturalHeight;
+    naturalW = tmp.naturalWidth;
+    naturalH = tmp.naturalHeight;
 
-    // Set map container to viewport width, proportional height
-    const vw = window.innerWidth;
-    const ratio = mapH / mapW;
-    const dispW = vw;
-    const dispH = Math.round(vw * ratio);
+    // Remove empty state
+    document.getElementById('mapEmpty')?.remove();
+    mapImgEl.querySelectorAll('img.mapbg').forEach(e=>e.remove());
 
-    mapImg.style.width  = dispW + 'px';
-    mapImg.style.height = dispH + 'px';
+    const img = document.createElement('img');
+    img.className = 'mapbg';
+    img.src = url;
+    img.draggable = false;
+    mapImgEl.insertBefore(img, mapImgEl.firstChild);
 
-    const bgImg = document.createElement('img');
-    bgImg.className = 'mapbg';
-    bgImg.src = url;
-    bgImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
-    mapImg.insertBefore(bgImg, mapImg.firstChild);
+    document.body.classList.add('map-loaded');
+    resizeMap();
 
-    // Reset transform so map fills screen
-    sc = 1; tx = 0; ty = 0;
-    applyT();
+    // Wire tap on map
+    mapImgEl.addEventListener('click', onMapClick);
   };
   tmp.src = url;
 }
 
-// ─── PAN / ZOOM ────────────────────────────────
-function applyT() { mapCanvas.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`; }
-function doZoom(f) { sc = Math.min(5, Math.max(0.2, sc*f)); applyT(); }
+function resizeMap() {
+  if(!naturalW || !naturalH) return;
+  const areaW = mapArea.clientWidth;
+  const areaH = mapArea.clientHeight;
+  const ratio = naturalW / naturalH;
+  const areaRatio = areaW / areaH;
 
-mapArea.addEventListener('touchstart', e => {
-  tchs = Array.from(e.touches);
-  if(tchs.length===1) {
-    sx=tchs[0].clientX; sy=tchs[0].clientY; stx=tx; sty=ty; drag=true;
+  let w, h;
+  if(ratio > areaRatio) {
+    // image wider than area → fit width
+    w = areaW;
+    h = areaW / ratio;
+  } else {
+    // image taller → fit height
+    h = areaH;
+    w = areaH * ratio;
   }
-  if(tchs.length===2) {
-    drag=false;
-    ldist = Math.hypot(tchs[0].clientX-tchs[1].clientX, tchs[0].clientY-tchs[1].clientY);
-  }
-},{passive:true});
 
-mapArea.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const cur = Array.from(e.touches);
-  if(cur.length===1 && drag) {
-    tx = stx+(cur[0].clientX-sx); ty = sty+(cur[0].clientY-sy); applyT();
-  }
-  if(cur.length===2) {
-    const d = Math.hypot(cur[0].clientX-cur[1].clientX, cur[0].clientY-cur[1].clientY);
-    sc = Math.min(5, Math.max(0.2, sc*(d/ldist))); ldist=d; applyT();
-  }
-},{passive:false});
+  mapImgEl.style.width  = Math.round(w) + 'px';
+  mapImgEl.style.height = Math.round(h) + 'px';
+}
 
-mapArea.addEventListener('touchend', e => {
-  const t = e.changedTouches[0];
-  const wasTap = drag && Math.abs(t.clientX-sx)<12 && Math.abs(t.clientY-sy)<12;
-  drag=false; tchs=[];
-  if(editing && wasTap) {
-    if(t.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.cat-pill')) return;
-    const rect = mapImg.getBoundingClientRect();
-    const rx = (t.clientX - rect.left) / rect.width;
-    const ry = (t.clientY - rect.top)  / rect.height;
-    if(rx>=0 && ry>=0 && rx<=1 && ry<=1) openAdd(rx, ry);
-  }
-},{passive:true});
+// ── MAP CLICK (add point) ──────────────────────
+function onMapClick(e) {
+  if(!editing) return;
+  // Ignore clicks on existing pins
+  if(e.target.closest('.point')) return;
 
-mapArea.addEventListener('mousedown', e => {
-  if(e.target.closest('.point,.zbtn,.upload-fab')) return;
-  sx=e.clientX; sy=e.clientY; stx=tx; sty=ty; drag=true; e.preventDefault();
-});
-window.addEventListener('mousemove', e => {
-  if(!drag) return; tx=stx+(e.clientX-sx); ty=sty+(e.clientY-sy); applyT();
-});
-window.addEventListener('mouseup', e => {
-  const wasTap = drag && Math.abs(e.clientX-sx)<5 && Math.abs(e.clientY-sy)<5;
-  drag=false;
-  if(editing && wasTap) {
-    if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.cat-pill')) return;
-    const rect = mapImg.getBoundingClientRect();
-    const rx=(e.clientX-rect.left)/rect.width, ry=(e.clientY-rect.top)/rect.height;
-    if(rx>=0&&ry>=0&&rx<=1&&ry<=1) openAdd(rx,ry);
-  }
-});
-mapArea.addEventListener('wheel', e=>{
-  e.preventDefault(); sc=Math.min(5,Math.max(0.2,sc*(e.deltaY<0?1.1:0.9))); applyT();
-},{passive:false});
+  const rect = mapImgEl.getBoundingClientRect();
+  const rx = (e.clientX - rect.left) / rect.width;
+  const ry = (e.clientY - rect.top)  / rect.height;
+  if(rx < 0 || ry < 0 || rx > 1 || ry > 1) return;
 
-// ─── EDIT MODE ─────────────────────────────────
+  pendRx = rx; pendRy = ry;
+  openAdd();
+}
+
+// ── EDIT MODE ──────────────────────────────────
 function toggleEdit() {
   editing = !editing;
   document.body.classList.toggle('editing', editing);
@@ -604,15 +627,15 @@ function toggleEdit() {
   document.getElementById('eLabel').textContent = editing ? 'Valider' : 'Éditer';
 }
 
-// ─── CATEGORIES ────────────────────────────────
+// ── CATEGORIES ─────────────────────────────────
 function renderCats() {
   const bar = document.getElementById('catsBar');
-  bar.querySelectorAll('.cat-pill').forEach(e=>e.remove());
+  bar.querySelectorAll('.cat-pill').forEach(e => e.remove());
   const addBtn = bar.querySelector('.cat-add-pill');
   catOrder.forEach(id => {
     const c = CATS[id]; if(!c) return;
     const d = document.createElement('div');
-    d.className = 'cat-pill' + (id===activeCat?' active':'');
+    d.className = 'cat-pill' + (id===activeCat ? ' active' : '');
     d.dataset.cat = id;
     if(id===activeCat) d.style.background = c.color;
     d.innerHTML = `
@@ -632,191 +655,207 @@ function renderCats() {
 function selectCat(id) {
   activeCat = id;
   document.querySelectorAll('#catsBar .cat-pill').forEach(p => {
-    const on = p.dataset.cat===id;
+    const on = p.dataset.cat === id;
     p.classList.toggle('active', on);
-    p.style.background = on ? (CATS[id]?.color||'') : '';
+    p.style.background = on ? (CATS[id]?.color || '') : '';
   });
 }
 
 function delCat(id) {
-  if(points.some(p=>p.cat===id)) { alert('Supprimez d\'abord les points de cette catégorie.'); return; }
+  if(points.some(p => p.cat===id)) { alert('Supprimez d\'abord les points de cette catégorie.'); return; }
   if(!confirm(`Supprimer "${CATS[id]?.label}" ?`)) return;
-  delete CATS[id]; catOrder = catOrder.filter(x=>x!==id);
+  delete CATS[id];
+  catOrder = catOrder.filter(x => x!==id);
   if(activeCat===id) activeCat = catOrder[0]||'';
   saveCats(); renderCats();
-  mapImg.querySelectorAll('.point').forEach(e=>e.remove()); points.forEach(renderPin);
+  mapImgEl.querySelectorAll('.point').forEach(e=>e.remove());
+  points.forEach(renderPin);
 }
 
 function updateCounts() {
   catOrder.forEach(id => {
     const el = document.getElementById('cnt-'+id);
-    if(el) el.textContent = points.filter(p=>p.cat===id).length;
+    if(el) el.textContent = points.filter(p => p.cat===id).length;
   });
 }
 
-// ─── ADD POINT ─────────────────────────────────
-function openAdd(rx, ry) {
-  // If no category yet, use first available
+// ── ADD POINT SHEET ────────────────────────────
+function openAdd() {
   if(!activeCat || !CATS[activeCat]) {
     activeCat = catOrder[0];
     if(!activeCat) { alert('Créez d\'abord une catégorie.'); return; }
   }
-  pendX=rx; pendY=ry;
   const c = CATS[activeCat];
   document.getElementById('addHead').style.background = c.color;
   document.getElementById('addTitle').textContent = `${c.emoji} Nouveau ${c.label}`;
   document.getElementById('ptName').value = '';
   document.getElementById('ptDesc').value = '';
   document.getElementById('addOverlay').classList.add('show');
-  addJustOpened = true;
-  setTimeout(()=>{ addJustOpened = false; }, 600);
-  setTimeout(()=>document.getElementById('ptName').focus(), 300);
+  // Focus after animation
+  setTimeout(() => document.getElementById('ptName').focus(), 350);
 }
-function closeAdd() { document.getElementById('addOverlay').classList.remove('show'); }
+
+function closeAdd() {
+  document.getElementById('addOverlay').classList.remove('show');
+}
+
 function doAddPoint() {
   const nameEl = document.getElementById('ptName');
-  const name = nameEl ? nameEl.value.trim() : '';
+  const name = nameEl.value.trim();
   if(!name) {
-    if(nameEl) { nameEl.style.borderColor='#ef4444'; nameEl.focus(); }
+    nameEl.style.borderColor = '#ef4444';
+    nameEl.focus();
     return;
   }
-  if(nameEl) nameEl.style.borderColor='';
-  const descEl = document.getElementById('ptDesc');
-  const desc = descEl ? descEl.value.trim() : '';
-  const p = { id:Date.now(), cat:activeCat, rx:pendX, ry:pendY, label:name, desc:desc, photos:[] };
+  nameEl.style.borderColor = '';
+  const desc = document.getElementById('ptDesc').value.trim();
+  const p = {
+    id: Date.now(),
+    cat: activeCat,
+    rx: pendRx,
+    ry: pendRy,
+    label: name,
+    desc: desc,
+    photos: []
+  };
   savePoint(p);
   closeAdd();
 }
-document.getElementById('ptName').addEventListener('keydown',e=>{ if(e.key==='Enter') doAddPoint(); if(e.key==='Escape') closeAdd(); });
-// Guard: don't close immediately after opening (touch event bleeds into click)
-let addJustOpened = false;
-document.getElementById('addOverlay').addEventListener('click',e=>{
-  if(addJustOpened) return;
-  if(e.target===document.getElementById('addOverlay')) closeAdd();
-});
 
-// ─── POINT DETAIL ──────────────────────────────
+// ── POINT DETAIL ───────────────────────────────
 function openDetail(p) {
   currentPt = p;
-  const c = CATS[p.cat]||{emoji:'📍',color:'#64748b',label:'Autre'};
+  const c = CATS[p.cat] || {emoji:'📍', color:'#64748b', label:'Autre'};
   document.getElementById('detailHead').style.background = c.color;
-  document.getElementById('detailHeadTitle').textContent = `${c.emoji} ${c.label}`;
+  document.getElementById('detailTitle').textContent = `${c.emoji} ${p.label}`;
 
-  let h = `<div class="pp-cat-badge" style="background:${c.color}">${c.emoji} ${c.label}</div>`;
+  let h = `<div class="pp-badge" style="background:${c.color}">${c.emoji} ${c.label}</div>`;
   h += `<div class="pp-title">${p.label}</div>`;
   h += p.desc ? `<div class="pp-desc">${p.desc}</div>` : `<div class="pp-nodesc">Aucune description</div>`;
 
-  // photos
-  if(p.photos&&p.photos.length) {
+  if(p.photos && p.photos.length) {
     h += `<div class="pp-photos">`;
-    p.photos.forEach((url,i)=>{
-      h += `<div class="pp-photo"><img src="${url}" onclick="openViewer('${url}')">
-             <button class="del-photo" onclick="doDelPhoto(${i})">×</button></div>`;
+    p.photos.forEach((url,i) => {
+      h += `<div class="pp-photo">
+        <img src="${url}" onclick="openViewer('${url}')">
+        <button class="del-ph" onclick="doDelPhoto(${i})">×</button>
+      </div>`;
     });
     h += `</div>`;
   }
-  h += `<label class="add-photo-btn" for="ppPhotoInput">📷 Ajouter des photos</label>
+
+  h += `<label class="add-photo-lbl" for="ppPhotoInput">📷 Ajouter des photos</label>
         <input type="file" id="ppPhotoInput" accept="image/*" multiple onchange="doAddPhoto(event)">`;
 
-  // edit desc
-  h += `<div class="edit-desc-section">
-    <label class="flabel" style="margin-top:8px">✏️ Modifier</label>
-    <input class="finput" id="ppEditName" value="${p.label}" placeholder="Nom" maxlength="40">
-    <textarea class="ftextarea" id="ppEditDesc" placeholder="Description...">${p.desc||''}</textarea>
-    <button class="gbtn ok" style="width:100%;margin-bottom:8px" onclick="doSaveDetail()">💾 Sauvegarder</button>
+  h += `<div class="edit-section">
+    <label class="flabel" style="margin-top:4px">✏️ Modifier</label>
+    <input class="finput" id="ppName" type="text" value="${p.label.replace(/"/g,'&quot;')}" maxlength="40" autocomplete="off">
+    <textarea class="ftextarea" id="ppDesc" placeholder="Description...">${p.desc||''}</textarea>
+    <button class="gbtn ok" style="width:100%;margin-bottom:10px" onclick="doSaveDetail()">💾 Sauvegarder</button>
   </div>`;
-  h += `<button class="del-point-btn" onclick="doDelPoint()">🗑️ Supprimer ce point</button>`;
+
+  h += `<button class="del-pt-btn" onclick="doDelPoint()">🗑️ Supprimer ce point</button>`;
 
   document.getElementById('detailBody').innerHTML = h;
   document.getElementById('detailOverlay').classList.add('show');
 }
-function closeDetail() { document.getElementById('detailOverlay').classList.remove('show'); currentPt=null; }
-document.getElementById('detailOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('detailOverlay')) closeDetail(); });
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('show');
+  currentPt = null;
+}
 
 function doSaveDetail() {
-  const p = points.find(x=>x.id===currentPt.id); if(!p) return;
-  const name = document.getElementById('ppEditName').value.trim(); if(!name) return;
+  const p = points.find(x => x.id===currentPt.id); if(!p) return;
+  const name = document.getElementById('ppName').value.trim(); if(!name) return;
   p.label = name;
-  p.desc  = document.getElementById('ppEditDesc').value.trim();
-  savePoint(p); closeDetail();
+  p.desc  = document.getElementById('ppDesc').value.trim();
+  savePoint(p);
+  closeDetail();
 }
+
 function doDelPoint() {
   if(confirm('Supprimer ce point ?')) { deletePoint(currentPt.id); closeDetail(); }
 }
+
 function doAddPhoto(e) {
-  const p = points.find(x=>x.id===currentPt.id); if(!p) return;
-  if(!p.photos) p.photos=[];
-  const files=Array.from(e.target.files); let left=files.length;
-  files.forEach(f=>{
-    const r=new FileReader();
-    r.onload=ev=>{ p.photos.push(ev.target.result); if(--left===0){savePoint(p); openDetail(p);} };
+  const p = points.find(x => x.id===currentPt.id); if(!p) return;
+  if(!p.photos) p.photos = [];
+  const files = Array.from(e.target.files); let left = files.length;
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => {
+      p.photos.push(ev.target.result);
+      if(--left === 0) { savePoint(p); openDetail(p); }
+    };
     r.readAsDataURL(f);
   });
 }
+
 function doDelPhoto(i) {
-  const p=points.find(x=>x.id===currentPt.id); if(!p) return;
-  if(confirm('Supprimer cette photo ?')){ p.photos.splice(i,1); savePoint(p); openDetail(p); }
+  const p = points.find(x => x.id===currentPt.id); if(!p) return;
+  if(confirm('Supprimer cette photo ?')) { p.photos.splice(i,1); savePoint(p); openDetail(p); }
 }
 
-// ─── RENDER PIN ────────────────────────────────
+// ── RENDER PIN ─────────────────────────────────
 function renderPin(p) {
-  const c = CATS[p.cat]||{emoji:'📍',color:'#64748b'};
+  const c = CATS[p.cat] || {emoji:'📍', color:'#64748b'};
   const el = document.createElement('div');
-  el.className = 'point'; el.id='pt-'+p.id; el.dataset.cat=p.cat;
-
-  // Position: use ratio if available, fallback to absolute px
-  if(p.rx !== undefined) {
-    el.style.left = (p.rx*100)+'%';
-    el.style.top  = (p.ry*100)+'%';
-  } else {
-    // Legacy px: convert to ratio based on 800x600 default
-    el.style.left = ((p.x||0)/800*100)+'%';
-    el.style.top  = ((p.y||0)/600*100)+'%';
-  }
-
+  el.className = 'point';
+  el.id = 'pt-' + p.id;
+  el.style.left = (p.rx * 100) + '%';
+  el.style.top  = (p.ry * 100) + '%';
   el.innerHTML = `<div class="pin" style="background:${c.color}"><span class="pin-inner">${c.emoji}</span></div>`;
-  el.addEventListener('click', ev=>{ ev.stopPropagation(); openDetail(p); });
-
-  let ptimer;
-  el.addEventListener('touchstart',ev=>{ ev.stopPropagation(); ptimer=setTimeout(()=>openDetail(p),150); },{passive:true});
-  el.addEventListener('touchend',  ev=>{ ev.stopPropagation(); clearTimeout(ptimer); },{passive:true});
-  el.addEventListener('touchmove', ()=>clearTimeout(ptimer),{passive:true});
-
-  mapImg.appendChild(el);
+  el.addEventListener('click', ev => { ev.stopPropagation(); openDetail(p); });
+  mapImgEl.appendChild(el);
 }
 
-// ─── CAT MODAL ─────────────────────────────────
-let editCatId=null, selEmoji=EMOJIS[0], selColor=COLORS[0];
+// ── CAT MODAL ──────────────────────────────────
 function openCatModal(id) {
-  editCatId=id;
-  const c=id?CATS[id]:null;
-  document.getElementById('catTitle').textContent=id?'✏️ Modifier':'➕ Nouvelle catégorie';
-  document.getElementById('catName').value=c?c.label:'';
-  selEmoji=c?c.emoji:EMOJIS[0]; selColor=c?c.color:COLORS[0];
-  document.getElementById('emojiGrid').innerHTML=EMOJIS.map(em=>
+  editCatId = id;
+  const c = id ? CATS[id] : null;
+  document.getElementById('catTitle').textContent = id ? '✏️ Modifier' : '➕ Nouvelle catégorie';
+  document.getElementById('catName').value = c ? c.label : '';
+  selEmoji = c ? c.emoji : EMOJIS[0];
+  selColor = c ? c.color : COLORS[0];
+  document.getElementById('emojiGrid').innerHTML = EMOJIS.map(em =>
     `<div class="emj${em===selEmoji?' sel':''}" onclick="pickEmoji('${em}')">${em}</div>`).join('');
-  document.getElementById('colorRow').innerHTML=COLORS.map(co=>
+  document.getElementById('colorRow').innerHTML = COLORS.map(co =>
     `<div class="clr${co===selColor?' sel':''}" style="background:${co}" onclick="pickColor('${co}')"></div>`).join('');
   document.getElementById('catOverlay').classList.add('show');
-  setTimeout(()=>document.getElementById('catName').focus(),300);
+  setTimeout(() => document.getElementById('catName').focus(), 350);
 }
 function closeCatModal() { document.getElementById('catOverlay').classList.remove('show'); }
 function pickEmoji(e) { selEmoji=e; document.querySelectorAll('.emj').forEach(el=>el.classList.toggle('sel',el.textContent===e)); }
 function pickColor(c) { selColor=c; document.querySelectorAll('.clr').forEach(el=>el.classList.toggle('sel',el.style.background===c||el.style.backgroundColor===c)); }
 function doSaveCat() {
-  const name=document.getElementById('catName').value.trim(); if(!name){alert('Nom requis');return;}
-  if(editCatId){ CATS[editCatId].label=name; CATS[editCatId].emoji=selEmoji; CATS[editCatId].color=selColor; }
-  else { const nid='cat_'+Date.now(); CATS[nid]={id:nid,label:name,emoji:selEmoji,color:selColor}; catOrder.push(nid); activeCat=nid; }
+  const name = document.getElementById('catName').value.trim();
+  if(!name) { alert('Nom requis'); return; }
+  if(editCatId) {
+    CATS[editCatId].label=name; CATS[editCatId].emoji=selEmoji; CATS[editCatId].color=selColor;
+  } else {
+    const nid='cat_'+Date.now();
+    CATS[nid]={id:nid,label:name,emoji:selEmoji,color:selColor};
+    catOrder.push(nid); activeCat=nid;
+  }
   saveCats(); renderCats();
-  mapImg.querySelectorAll('.point').forEach(e=>e.remove()); points.forEach(renderPin);
+  mapImgEl.querySelectorAll('.point').forEach(e=>e.remove());
+  points.forEach(renderPin);
   closeCatModal();
 }
-document.getElementById('catName').addEventListener('keydown',e=>{if(e.key==='Enter')doSaveCat();if(e.key==='Escape')closeCatModal();});
-document.getElementById('catOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('catOverlay'))closeCatModal();});
 
-// ─── PHOTO VIEWER ──────────────────────────────
+// ── PHOTO VIEWER ───────────────────────────────
 function openViewer(url) { document.getElementById('pvImg').src=url; document.getElementById('photoViewer').classList.add('show'); }
 function closeViewer() { document.getElementById('photoViewer').classList.remove('show'); }
+
+// ── CLOSE OVERLAYS ON BG CLICK ─────────────────
+document.getElementById('detailOverlay').addEventListener('click', e => {
+  if(e.target===document.getElementById('detailOverlay')) closeDetail();
+});
+document.getElementById('catOverlay').addEventListener('click', e => {
+  if(e.target===document.getElementById('catOverlay')) closeCatModal();
+});
+// addOverlay: no bg click to close (avoid accidental close on mobile)
 </script>
 </body>
 </html>
