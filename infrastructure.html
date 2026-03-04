@@ -531,34 +531,38 @@ function doZoom(f) { sc = Math.min(5, Math.max(0.2, sc*f)); applyT(); }
 
 mapArea.addEventListener('touchstart', e => {
   tchs = Array.from(e.touches);
-  if(tchs.length===1) { sx=tchs[0].clientX; sy=tchs[0].clientY; stx=tx; sty=ty; drag=true; }
-  if(tchs.length===2) ldist = Math.hypot(tchs[0].clientX-tchs[1].clientX, tchs[0].clientY-tchs[1].clientY);
+  if(tchs.length===1) {
+    sx=tchs[0].clientX; sy=tchs[0].clientY; stx=tx; sty=ty; drag=true;
+  }
+  if(tchs.length===2) {
+    drag=false;
+    ldist = Math.hypot(tchs[0].clientX-tchs[1].clientX, tchs[0].clientY-tchs[1].clientY);
+  }
 },{passive:true});
 
 mapArea.addEventListener('touchmove', e => {
   e.preventDefault();
-  tchs = Array.from(e.touches);
-  if(tchs.length===1 && drag) {
-    tx = stx+(tchs[0].clientX-sx); ty = sty+(tchs[0].clientY-sy); applyT();
+  const cur = Array.from(e.touches);
+  if(cur.length===1 && drag) {
+    tx = stx+(cur[0].clientX-sx); ty = sty+(cur[0].clientY-sy); applyT();
   }
-  if(tchs.length===2) {
-    const d = Math.hypot(tchs[0].clientX-tchs[1].clientX, tchs[0].clientY-tchs[1].clientY);
+  if(cur.length===2) {
+    const d = Math.hypot(cur[0].clientX-cur[1].clientX, cur[0].clientY-cur[1].clientY);
     sc = Math.min(5, Math.max(0.2, sc*(d/ldist))); ldist=d; applyT();
   }
 },{passive:false});
 
 mapArea.addEventListener('touchend', e => {
-  if(editing && tchs.length<=1 && e.changedTouches.length===1) {
-    const t = e.changedTouches[0];
-    if(Math.abs(t.clientX-sx)<8 && Math.abs(t.clientY-sy)<8 && drag) {
-      const rect = mapImg.getBoundingClientRect();
-      // Store as ratio of map size so coords are resolution-independent
-      const rx = (t.clientX - rect.left) / rect.width;
-      const ry = (t.clientY - rect.top)  / rect.height;
-      if(rx>=0&&ry>=0&&rx<=1&&ry<=1) openAdd(rx, ry);
-    }
-  }
+  const t = e.changedTouches[0];
+  const wasTap = drag && Math.abs(t.clientX-sx)<12 && Math.abs(t.clientY-sy)<12;
   drag=false; tchs=[];
+  if(editing && wasTap) {
+    if(t.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.cat-pill')) return;
+    const rect = mapImg.getBoundingClientRect();
+    const rx = (t.clientX - rect.left) / rect.width;
+    const ry = (t.clientY - rect.top)  / rect.height;
+    if(rx>=0 && ry>=0 && rx<=1 && ry<=1) openAdd(rx, ry);
+  }
 },{passive:true});
 
 mapArea.addEventListener('mousedown', e => {
@@ -569,14 +573,14 @@ window.addEventListener('mousemove', e => {
   if(!drag) return; tx=stx+(e.clientX-sx); ty=sty+(e.clientY-sy); applyT();
 });
 window.addEventListener('mouseup', e => {
-  if(drag && editing) {
-    if(Math.abs(e.clientX-sx)<5 && Math.abs(e.clientY-sy)<5) {
-      const rect = mapImg.getBoundingClientRect();
-      const rx=(e.clientX-rect.left)/rect.width, ry=(e.clientY-rect.top)/rect.height;
-      if(rx>=0&&ry>=0&&rx<=1&&ry<=1) openAdd(rx,ry);
-    }
-  }
+  const wasTap = drag && Math.abs(e.clientX-sx)<5 && Math.abs(e.clientY-sy)<5;
   drag=false;
+  if(editing && wasTap) {
+    if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.cat-pill')) return;
+    const rect = mapImg.getBoundingClientRect();
+    const rx=(e.clientX-rect.left)/rect.width, ry=(e.clientY-rect.top)/rect.height;
+    if(rx>=0&&ry>=0&&rx<=1&&ry<=1) openAdd(rx,ry);
+  }
 });
 mapArea.addEventListener('wheel', e=>{
   e.preventDefault(); sc=Math.min(5,Math.max(0.2,sc*(e.deltaY<0?1.1:0.9))); applyT();
@@ -643,7 +647,11 @@ function updateCounts() {
 
 // ─── ADD POINT ─────────────────────────────────
 function openAdd(rx, ry) {
-  if(!activeCat||!CATS[activeCat]) return;
+  // If no category yet, use first available
+  if(!activeCat || !CATS[activeCat]) {
+    activeCat = catOrder[0];
+    if(!activeCat) { alert('Créez d\'abord une catégorie.'); return; }
+  }
   pendX=rx; pendY=ry;
   const c = CATS[activeCat];
   document.getElementById('addHead').style.background = c.color;
