@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#16a34a">
 <title>Infrastructure - Le Bellevue</title>
 <style>
@@ -107,22 +107,7 @@ body.editing .cat-add-pill { display:flex; }
   pointer-events:none;
 }
 
-/* Portrait hint */
-.rotate-hint {
-  display:none;
-  position:absolute; inset:0;
-  background:rgba(22,101,52,0.92);
-  align-items:center; justify-content:center;
-  flex-direction:column; gap:16px; color:white; z-index:50;
-  text-align:center; padding:30px;
-}
-.rotate-hint .icon { font-size:56px; }
-.rotate-hint p { font-size:17px; font-weight:700; }
-.rotate-hint small { font-size:13px; opacity:.8; }
 
-/* Show hint in portrait when map is loaded */
-body.map-loaded.portrait .rotate-hint { display:flex; }
-body.editing.map-loaded.portrait .rotate-hint { display:none; } /* allow editing in portrait too */
 
 /* Empty state */
 .map-empty {
@@ -320,7 +305,7 @@ body.editing .del-pt-btn { display:block; }
     <a href="index.html" class="back-btn">&#8249;</a>
     <h1>🏗️ Infrastructure</h1>
   </div>
-  <button class="fs-btn" id="fsBtn" onclick="goFullscreen()" title="Plein écran">⛶</button>
+  <button class="fs-btn" id="fsBtn" onclick="enterFullscreenLandscape()" title="Plein écran">⛶</button>
   <button class="edit-btn" id="editBtn" onclick="toggleEdit()">
     <span id="eIcon">✏️</span>
     <span id="eLabel">Éditer</span>
@@ -383,13 +368,6 @@ body.editing .del-pt-btn { display:block; }
       <p>Importez un plan du camping</p>
       <small>Bouton "Importer un plan" ci-dessus</small>
     </div>
-  </div>
-
-  <!-- Portrait overlay -->
-  <div class="rotate-hint">
-    <span class="icon">🔄</span>
-    <p>Tournez votre téléphone</p>
-    <small>La carte s'affiche en mode paysage</small>
   </div>
 
   <div class="edit-hint">✏️ Appuyez sur la carte pour ajouter un point</div>
@@ -499,12 +477,51 @@ window.addEventListener('load', () => {
     p.addEventListener('click', () => selectCat(p.dataset.cat));
   });
 
-  // Add confirm button listener (not onclick to avoid issues)
+  // Add confirm button listener
   document.getElementById('addConfirmBtn').addEventListener('click', doAddPoint);
+
+  // Force fullscreen + landscape immediately
+  enterFullscreenLandscape();
 
   fixBodyHeight();
   checkOrientation();
   loadFirebase();
+});
+
+function enterFullscreenLandscape() {
+  // 1. Request fullscreen
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+  if(req) {
+    req.call(el).then(() => {
+      // 2. Lock orientation to landscape once fullscreen is granted
+      lockLandscape();
+    }).catch(() => {
+      // Fullscreen denied (iOS), still try orientation lock
+      lockLandscape();
+    });
+  } else {
+    lockLandscape();
+  }
+}
+
+function lockLandscape() {
+  try {
+    if(screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    } else if(window.screen.lockOrientation) {
+      window.screen.lockOrientation('landscape');
+    } else if(window.screen.mozLockOrientation) {
+      window.screen.mozLockOrientation('landscape');
+    }
+  } catch(e) {}
+}
+
+// Unlock when leaving the page
+window.addEventListener('beforeunload', () => {
+  try {
+    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  } catch(e) {}
 });
 
 function fixBodyHeight() {
@@ -863,24 +880,19 @@ function openViewer(url) { document.getElementById('pvImg').src=url; document.ge
 function closeViewer() { document.getElementById('photoViewer').classList.remove('show'); }
 
 // ── FULLSCREEN ────────────────────────────────────
-function goFullscreen() {
-  const el = document.documentElement;
-  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
-  if(req) {
-    req.call(el).catch(()=>{});
-  }
-}
-
 document.addEventListener('fullscreenchange', updateFsBtn);
 document.addEventListener('webkitfullscreenchange', updateFsBtn);
 function updateFsBtn() {
   const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
   const btn = document.getElementById('fsBtn');
-  btn.textContent = inFs ? '✕' : '⛶';
-  btn.onclick = inFs ? exitFs : goFullscreen;
-  setTimeout(() => { fixBodyHeight(); resizeMap(); }, 200);
+  btn.textContent = inFs ? '⊠' : '⛶';
+  btn.onclick = inFs ? exitFs : enterFullscreenLandscape;
+  setTimeout(() => { fixBodyHeight(); resizeMap(); }, 300);
 }
 function exitFs() {
+  try {
+    if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  } catch(e) {}
   const ex = document.exitFullscreen || document.webkitExitFullscreen;
   if(ex) ex.call(document).catch(()=>{});
 }
