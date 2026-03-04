@@ -151,6 +151,8 @@ body.editing .edit-hint { display:block; }
   position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
   display:flex; align-items:flex-end; justify-content:center;
   opacity:0; pointer-events:none; transition:opacity .2s;
+  /* Stay above virtual keyboard */
+  bottom:env(keyboard-inset-height, 0);
 }
 .overlay.show { opacity:1; pointer-events:all; }
 .sheet {
@@ -158,6 +160,13 @@ body.editing .edit-hint { display:block; }
   transform:translateY(100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
   max-height:88dvh; overflow-y:auto;
   box-shadow:0 -4px 24px rgba(0,0,0,0.18);
+  color:#111;
+}
+/* Ensure text visible in all inputs */
+.sheet input, .sheet textarea {
+  color:#111 !important;
+  -webkit-text-fill-color:#111 !important;
+  opacity:1 !important;
 }
 .overlay.show .sheet { transform:translateY(0); }
 .sheet-handle {
@@ -659,19 +668,32 @@ function openAdd(rx, ry) {
   document.getElementById('ptName').value = '';
   document.getElementById('ptDesc').value = '';
   document.getElementById('addOverlay').classList.add('show');
+  addJustOpened = true;
+  setTimeout(()=>{ addJustOpened = false; }, 600);
   setTimeout(()=>document.getElementById('ptName').focus(), 300);
 }
 function closeAdd() { document.getElementById('addOverlay').classList.remove('show'); }
 function doAddPoint() {
-  const name = document.getElementById('ptName').value.trim();
-  if(!name) { document.getElementById('ptName').style.borderColor='#ef4444'; document.getElementById('ptName').focus(); return; }
-  document.getElementById('ptName').style.borderColor='';
-  const p = { id:Date.now(), cat:activeCat, rx:pendX, ry:pendY, label:name, desc:document.getElementById('ptDesc').value.trim(), photos:[] };
+  const nameEl = document.getElementById('ptName');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if(!name) {
+    if(nameEl) { nameEl.style.borderColor='#ef4444'; nameEl.focus(); }
+    return;
+  }
+  if(nameEl) nameEl.style.borderColor='';
+  const descEl = document.getElementById('ptDesc');
+  const desc = descEl ? descEl.value.trim() : '';
+  const p = { id:Date.now(), cat:activeCat, rx:pendX, ry:pendY, label:name, desc:desc, photos:[] };
   savePoint(p);
   closeAdd();
 }
 document.getElementById('ptName').addEventListener('keydown',e=>{ if(e.key==='Enter') doAddPoint(); if(e.key==='Escape') closeAdd(); });
-document.getElementById('addOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('addOverlay')) closeAdd(); });
+// Guard: don't close immediately after opening (touch event bleeds into click)
+let addJustOpened = false;
+document.getElementById('addOverlay').addEventListener('click',e=>{
+  if(addJustOpened) return;
+  if(e.target===document.getElementById('addOverlay')) closeAdd();
+});
 
 // ─── POINT DETAIL ──────────────────────────────
 function openDetail(p) {
