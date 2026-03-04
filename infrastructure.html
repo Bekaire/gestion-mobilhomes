@@ -119,6 +119,21 @@ body.editing .cat-add-pill { display:flex; }
 .map-empty p { font-size:16px; font-weight:700; }
 .map-empty small { font-size:13px; color:#86efac; }
 
+/* Zoom buttons */
+.zoom-btns {
+  position:absolute; right:12px; bottom:16px;
+  display:flex; flex-direction:column; gap:6px; z-index:20;
+}
+.zbtn {
+  width:42px; height:42px; background:rgba(255,255,255,0.92);
+  border:none; border-radius:10px; color:#166534;
+  font-size:24px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);
+  user-select:none; -webkit-user-select:none;
+}
+.zbtn:active { background:#dcfce7; }
+
 /* Upload btn */
 .upload-fab {
   position:absolute; top:12px; left:50%; transform:translateX(-50%);
@@ -362,6 +377,7 @@ body.editing .del-pt-btn { display:block; }
   <label class="upload-fab" for="mapFileInput">🗺️ Importer un plan</label>
   <input type="file" id="mapFileInput" accept="image/*" onchange="loadMapImg(event)">
 
+  <div id="mapWrapper" style="position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;">
   <div id="mapImg">
     <div class="map-empty" id="mapEmpty">
       <span class="big">🗺️</span>
@@ -369,8 +385,16 @@ body.editing .del-pt-btn { display:block; }
       <small>Bouton "Importer un plan" ci-dessus</small>
     </div>
   </div>
+  </div><!-- end mapWrapper -->
 
   <div class="edit-hint">✏️ Appuyez sur la carte pour ajouter un point</div>
+
+  <!-- Zoom controls -->
+  <div class="zoom-btns">
+    <div class="zbtn" onclick="doZoom(1.3)">+</div>
+    <div class="zbtn" onclick="doZoom(0.77)">−</div>
+    <div class="zbtn" style="font-size:13px;font-weight:700;" onclick="resetZoom()">↺</div>
+  </div>
 </div>
 
 <!-- SHEET: Ajouter un point -->
@@ -468,7 +492,13 @@ let pendRx, pendRy;
 let editCatId = null, selEmoji = EMOJIS[0], selColor = COLORS[0];
 
 const mapArea = document.getElementById('mapArea');
-const mapImgEl = document.getElementById('mapImg');
+const mapImgEl  = document.getElementById('mapImg');
+const mapWrapper = document.getElementById('mapWrapper');
+
+// Pan/zoom state
+let sc=1, panX=0, panY=0;
+let isDragging=false, dragStartX, dragStartY, dragStartPanX, dragStartPanY;
+let lastPinchDist=0, isTouching=false;
 
 // ── INIT ───────────────────────────────────────
 window.addEventListener('load', () => {
@@ -631,7 +661,7 @@ function applyMapUrl(url) {
     resizeMap();
 
     // Wire tap on map
-    mapImgEl.addEventListener('click', onMapClick);
+    // tap handled by touchend/mouseup
   };
   tmp.src = url;
 }
@@ -644,34 +674,137 @@ function resizeMap() {
   const areaRatio = areaW / areaH;
 
   let w, h;
-  if(ratio > areaRatio) {
-    // image wider than area → fit width
-    w = areaW;
-    h = areaW / ratio;
-  } else {
-    // image taller → fit height
-    h = areaH;
-    w = areaH * ratio;
-  }
+  if(ratio > areaRatio) { w = areaW; h = areaW / ratio; }
+  else { h = areaH; w = areaH * ratio; }
 
   mapImgEl.style.width  = Math.round(w) + 'px';
   mapImgEl.style.height = Math.round(h) + 'px';
+
+  // Center the wrapper
+  panX = (areaW - w) / 2;
+  panY = (areaH - h) / 2;
+  sc = 1;
+  applyMapTransform();
 }
 
-// ── MAP CLICK (add point) ──────────────────────
-function onMapClick(e) {
-  if(!editing) return;
-  // Ignore clicks on existing pins
-  if(e.target.closest('.point')) return;
-
-  const rect = mapImgEl.getBoundingClientRect();
-  const rx = (e.clientX - rect.left) / rect.width;
-  const ry = (e.clientY - rect.top)  / rect.height;
-  if(rx < 0 || ry < 0 || rx > 1 || ry > 1) return;
-
-  pendRx = rx; pendRy = ry;
-  openAdd();
+function applyMapTransform() {
+  mapWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${sc})`;
 }
+
+function doZoom(factor) {
+  const areaW = mapArea.clientWidth;
+  const areaH = mapArea.clientHeight;
+  const newSc = Math.min(6, Math.max(0.3, sc * factor));
+  // Zoom toward center of map area
+  const cx = areaW / 2;
+  const cy = areaH / 2;
+  panX = cx - (cx - panX) * (newSc / sc);
+  panY = cy - (cy - panY) * (newSc / sc);
+  sc = newSc;
+  applyMapTransform();
+}
+
+function resetZoom() {
+  resizeMap(); // resets to fit screen
+}
+
+// ── TOUCH PAN/ZOOM ──────────────────────────────
+mapArea.addEventListener('touchstart', e => {
+  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.sheet')) return;
+  const touches = Array.from(e.touches);
+  if(touches.length === 1) {
+    isDragging = true; isTouching = true;
+    dragStartX = touches[0].clientX;
+    dragStartY = touches[0].clientY;
+    dragStartPanX = panX;
+    dragStartPanY = panY;
+  }
+  if(touches.length === 2) {
+    isDragging = false;
+    lastPinchDist = Math.hypot(
+      touches[0].clientX - touches[1].clientX,
+      touches[0].clientY - touches[1].clientY
+    );
+  }
+}, {passive: true});
+
+mapArea.addEventListener('touchmove', e => {
+  if(e.target.closest('.sheet')) return;
+  e.preventDefault();
+  const touches = Array.from(e.touches);
+  if(touches.length === 1 && isDragging) {
+    panX = dragStartPanX + (touches[0].clientX - dragStartX);
+    panY = dragStartPanY + (touches[0].clientY - dragStartY);
+    applyMapTransform();
+  }
+  if(touches.length === 2) {
+    const dist = Math.hypot(
+      touches[0].clientX - touches[1].clientX,
+      touches[0].clientY - touches[1].clientY
+    );
+    const midX = (touches[0].clientX + touches[1].clientX) / 2;
+    const midY = (touches[0].clientY + touches[1].clientY) / 2;
+    const newSc = Math.min(6, Math.max(0.3, sc * (dist / lastPinchDist)));
+    panX = midX - (midX - panX) * (newSc / sc);
+    panY = midY - (midY - panY) * (newSc / sc);
+    sc = newSc;
+    lastPinchDist = dist;
+    applyMapTransform();
+  }
+}, {passive: false});
+
+mapArea.addEventListener('touchend', e => {
+  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill')) { isDragging=false; isTouching=false; return; }
+  const t = e.changedTouches[0];
+  const wasTap = isDragging
+    && Math.abs(t.clientX - dragStartX) < 10
+    && Math.abs(t.clientY - dragStartY) < 10;
+  isDragging = false; isTouching = false;
+  if(editing && wasTap) {
+    const rect = mapImgEl.getBoundingClientRect();
+    const rx = (t.clientX - rect.left) / rect.width;
+    const ry = (t.clientY - rect.top)  / rect.height;
+    if(rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) openAdd(rx, ry);
+  }
+}, {passive: true});
+
+// Mouse pan (desktop)
+mapArea.addEventListener('mousedown', e => {
+  if(e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill,.point')) return;
+  isDragging = true;
+  dragStartX = e.clientX; dragStartY = e.clientY;
+  dragStartPanX = panX; dragStartPanY = panY;
+  mapArea.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if(!isDragging) return;
+  panX = dragStartPanX + (e.clientX - dragStartX);
+  panY = dragStartPanY + (e.clientY - dragStartY);
+  applyMapTransform();
+});
+window.addEventListener('mouseup', e => {
+  if(!isDragging) return;
+  const wasTap = Math.abs(e.clientX - dragStartX) < 5 && Math.abs(e.clientY - dragStartY) < 5;
+  isDragging = false;
+  mapArea.style.cursor = '';
+  if(editing && wasTap && !e.target.closest('.zbtn,.upload-fab,.pill-btn,.cat-add-pill')) {
+    const rect = mapImgEl.getBoundingClientRect();
+    const rx = (e.clientX - rect.left) / rect.width;
+    const ry = (e.clientY - rect.top)  / rect.height;
+    if(rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) openAdd(rx, ry);
+  }
+});
+mapArea.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.12 : 0.9;
+  const newSc = Math.min(6, Math.max(0.3, sc * factor));
+  panX = e.clientX - (e.clientX - panX) * (newSc / sc);
+  panY = e.clientY - (e.clientY - panY) * (newSc / sc);
+  sc = newSc;
+  applyMapTransform();
+}, {passive: false});
+
+
 
 // ── EDIT MODE ──────────────────────────────────
 function toggleEdit() {
